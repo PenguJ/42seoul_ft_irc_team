@@ -17,6 +17,8 @@
 # include <map>
 # include <stdexcept>
 # include <vector>
+# include "Channel.hpp"
+# include "User.hpp"
 
 typedef struct sockaddr SOCKADDR;
 typedef struct sockaddr_in SOCKADDR_IN;
@@ -140,8 +142,6 @@ private:
     const u_int16_t                 _port;
     const std::string               _PWD;
     std::vector<pollfd>             _PFDS;
-    std::map<int, User*>                 _users;
-    std::map<std::string, Channel*>      _channels;
 };
 
 //GLOBAL FUNCTION for class Server{}

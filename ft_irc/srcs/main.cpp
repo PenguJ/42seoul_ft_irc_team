@@ -1,6 +1,3 @@
-#include <iostream>
-#include <signal.h>
-#include <stdexcept>
 #include "../includes/Irc.hpp"
 
 bool Server::bRunning = true;
