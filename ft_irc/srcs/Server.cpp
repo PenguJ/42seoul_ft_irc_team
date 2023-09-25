@@ -165,18 +165,20 @@ void Server::execute()
 			}
 			else if (iter->revents & POLLIN)
 			{
-				if (iter->fd == _servSock)
+				if (iter->fd == _servSock)      // accept client
 				{
-					// check_password & accept
+					int ClntFD = -1;
 
 				}
-				else
+				else                            // response handling
 				{
+                    const char cBufLEN = 1024;
 					// interpret IRC CMD_MSG
+
 
 				}
 			}
-			else if (iter->revents & POLLHUP)
+			else if (iter->revents & POLLHUP)   // disconnect client
 			{
 				// disconnect process
 				// careful FD, vector, map, memory
