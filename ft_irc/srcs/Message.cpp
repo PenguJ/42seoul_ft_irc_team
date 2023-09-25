@@ -27,10 +27,13 @@ Message::~Message()
 Message::Message()
     : _FD(0)
     , _DB(NULL)
-{	}
+{
+	std::cerr<<"error: never works"<<std::endl;
+}
 
 Message& Message::operator=(const Message& rRhs)
 {
+	std::cerr<<"error: never works"<<std::endl;
 	if (this == &rRhs)
 	{
 		return (*this);
@@ -48,7 +51,9 @@ Message& Message::operator=(const Message& rRhs)
 Message::Message(const Message& rCopy)
     : _FD(0)
     , _DB(NULL)
-{	}
+{
+	std::cerr<<"error: never works"<<std::endl;
+}
 
 
 

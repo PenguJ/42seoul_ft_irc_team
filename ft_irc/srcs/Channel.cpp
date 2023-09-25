@@ -14,14 +14,23 @@
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
 	//PUBLIC:
-Channel::Channel()
-{	}
+Channel::Channel(std::string &topic, s_ChannelMode &mode)
+    : _topic(topic)
+    , _mode(mode)
+{   }
 
 Channel::~Channel()
 {	}
 
+	//PRIVATE:
+Channel::Channel()
+{
+	std::cerr<<"error: never works"<<std::endl;
+}
+
 Channel& Channel::operator=(const Channel& rRhs)
 {
+	std::cerr<<"error: never works"<<std::endl;
 	if (this == &rRhs)
 	{
 		return (*this);
@@ -37,9 +46,9 @@ Channel& Channel::operator=(const Channel& rRhs)
 }
 
 Channel::Channel(const Channel& rCopy)
-{	}
-
-	//PRIVATE:
+{
+	std::cerr<<"error: never works"<<std::endl;
+}
 
 
 

@@ -14,14 +14,27 @@
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
 	//PUBLIC:
-User::User()
-{	}
+User::User(std::string &realname, std::string &nickname, std::string &PWD, \
+        std::string &host, s_UserMode &mode)
+    : _realname(realname)
+    , _nickname(nickname)
+    , _PWD(PWD)
+    , _host(host)
+    , _mode(mode)
+{   }
 
 User::~User()
 {	}
 
+	//PRIVATE:
+User::User()
+{
+	std::cerr<<"error: never works"<<std::endl;
+}
+
 User& User::operator=(const User& rRhs)
 {
+	std::cerr<<"error: never works"<<std::endl;
 	if (this == &rRhs)
 	{
 		return (*this);
@@ -37,9 +50,9 @@ User& User::operator=(const User& rRhs)
 }
 
 User::User(const User& rCopy)
-{	}
-
-	//PRIVATE:
+{
+	std::cerr<<"error: never works"<<std::endl;
+}
 
 
 
