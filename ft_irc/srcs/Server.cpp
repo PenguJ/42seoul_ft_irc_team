@@ -160,26 +160,36 @@ void Server::execute()
 
         for (iter = _PFDS.begin(); iter != _PFDS.end(); ++iter)
         {
+            const bool NO_EVENT = (iter->revents != POLLIN);
             const bool SERV_POLLIN = (iter->revents & POLLIN) && \
                                     (iter->fd == _servSock);
             const bool CLNT_POLLIN = (iter->revents & POLLIN) && \
                                     (iter->fd != _servSock);
-            const bool CLNT_POLLHUP = iter->revents & POLLHUP;
 
-            if (SERV_POLLIN)
+// std::cout<<"for loop(servSock: "<<_servSock<<")"<<std::endl;
+            if (NO_EVENT)
             {
+// std::cout<<"NO_EVENT   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<std::endl;
+                continue ;
+            }
+            else if (SERV_POLLIN)
+            {
+// std::cout<<"event SERV_POLLIN   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<std::endl;
                 SOCKADDR_IN ADDR;
                 socklen_t AddrLEN = sizeof(ADDR);
                 int clntFD = accept(_servSock, (SOCKADDR*)&ADDR, &AddrLEN);
                 // ERR CHECK
-                std::cout<<"[+]fd["<<clntFD<<"]"<<" accepted!"<<std::endl;
+                std::cout<<"[+] fd: "<<clntFD<<": accepted!"<<std::endl;
 
                 pollfd clnt = {clntFD, POLLIN, 0};
 
                 _PFDS.push_back(clnt);
+                
+                goto ESCAPE_EVENT_SEARCHING_LOOP;
             }
             else if (CLNT_POLLIN)
             {
+// std::cout<<"event CLNT_POLLIN   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<std::endl;
                 char cBUFF[MAX_MSG_LEN] = {0, };
                 std::string BUFF;
                 ssize_t retVAL = 1;
@@ -189,26 +199,25 @@ void Server::execute()
                 {
                 case -1:
                 /* if exist ErrCode about bad condition of server, then send */
-                    break ;
+                    goto ESCAPE_EVENT_SEARCHING_LOOP;
                 case 0:
-                    break ;
+                    _pDB->clearAllInformationOfUser(iter->fd);
+                    close(iter->fd);
+                    _PFDS.erase(iter);
+                    std::cout<<"[-] fd: "<<iter->fd<<": disconnected!"<<std::endl;
+
+                    goto ESCAPE_EVENT_SEARCHING_LOOP;
                 default:
                     BUFF = cBUFF;
 
                     MessageHandler msgHandler(iter->fd, BUFF, _pDB);
 
                     msgHandler.run();
-                    break ;
+
+                    goto ESCAPE_EVENT_SEARCHING_LOOP;
                 }
             }
-            else if (CLNT_POLLHUP)
-            {
-                _pDB->clearAllInformationOfUser(iter->fd);
-                close(iter->fd);
-                _PFDS.erase(iter);
-                std::cout<<"[-]fd["<<iter->fd<<"]"<<" disconnected!"<<std::endl;
-            }
-        }
+        } ESCAPE_EVENT_SEARCHING_LOOP:;
     }
 }
 {   // Close Server
