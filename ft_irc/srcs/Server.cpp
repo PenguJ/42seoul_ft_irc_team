@@ -201,10 +201,11 @@ void Server::execute()
                 /* if exist ErrCode about bad condition of server, then send */
                     goto ESCAPE_EVENT_SEARCHING_LOOP;
                 case 0:
+                    std::cout<<"[-] fd: "<<iter->fd<<": disconnected!"<<std::endl;
                     _pDB->clearAllInformationOfUser(iter->fd);
                     close(iter->fd);
                     _PFDS.erase(iter);
-                    std::cout<<"[-] fd: "<<iter->fd<<": disconnected!"<<std::endl;
+                    
 
                     goto ESCAPE_EVENT_SEARCHING_LOOP;
                 default:
