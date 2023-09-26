@@ -15,7 +15,13 @@
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
     //PUBLIC:
 Database::Database()
-{	}
+{
+    const size_t FIRST_CAPACITY = 255;
+
+    _users.reserve(FIRST_CAPACITY);
+    _users.reserve(FIRST_CAPACITY);
+    _channelUserTable.reserve(FIRST_CAPACITY * FIRST_CAPACITY);
+}
 
 Database::~Database()
 {	}

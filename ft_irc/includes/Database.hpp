@@ -3,17 +3,24 @@
 # define DATABASE_HPP
 
 # include <iostream>
-# include <map>
 # include <vector>
 # include "Channel.hpp"
 # include "User.hpp"
 
+typedef std::pair<int, User*>               UserPair;
+typedef std::pair<std::string, Channel*>    ChannelPair;
+
+typedef std::vector<UserPair>               UserPairVector;
+typedef std::vector<ChannelPair>            ChannelPairVector;
+
 typedef struct ChannelUserNode
 {
-    std::map<std::string, Channel*>*    _channel;
-    std::map<int, User*>*               _user;
-    bool                                _bOP;
+    UserPair*       _user;
+    ChannelPair*    _channel;
+    bool            _bOP;
 }	s_ChannelUserNode;
+
+typedef std::vector<s_ChannelUserNode>      ChannelUserTable;
 
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
 //				멤버변수를 public으로 선언할 수 있다.
@@ -49,9 +56,9 @@ private:
     //Behavior
 
 private:
-    std::map<int, User*>            _users;
-    std::map<std::string, Channel*> _channels;
-    std::vector<s_ChannelUserNode>  _ChannelUserTable;
+    UserPairVector      _users;
+    ChannelPairVector   _channels;
+    ChannelUserTable    _channelUserTable;
 };
 
 //GLOBAL FUNCTION for class Database{}

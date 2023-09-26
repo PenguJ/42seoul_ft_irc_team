@@ -14,7 +14,6 @@
 # include <cstdlib>
 # include <cstring>
 # include <iostream>
-# include <map>
 # include <stdexcept>
 # include <vector>
 # include "Database.hpp"
