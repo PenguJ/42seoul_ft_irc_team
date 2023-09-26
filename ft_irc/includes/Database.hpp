@@ -10,9 +10,9 @@
 
 typedef struct ChannelUserNode
 {
-	std::map<std::string, Channel*>*    _channel;
-	std::map<int, User*>*               _user;
-	bool                                _bOP;
+    std::map<std::string, Channel*>*    _channel;
+    std::map<int, User*>*               _user;
+    bool                                _bOP;
 }	s_ChannelUserNode;
 
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
@@ -30,28 +30,28 @@ typedef struct ChannelUserNode
 class Database
 {
 public:
-	//Constructor overload & OCCF
-	Database();
-	~Database();
-	//Exception
-	//Operator overload
-	//Getter & Setter
-	//Behavior
+    //Constructor overload & OCCF
+    Database();
+    ~Database();
+    //Exception
+    //Operator overload
+    //Getter & Setter
+    //Behavior
     void clearAllInformationOfUser(const int FD);
 
 private:
-	//Constructor overload & OCCF
-	Database& operator=(const Database& rRhs);
-	Database(const Database& rCopy);
-	//Exception
-	//Operator overload
-	//Getter & Setter
-	//Behavior
+    //Constructor overload & OCCF
+    Database& operator=(const Database& rRhs);
+    Database(const Database& rCopy);
+    //Exception
+    //Operator overload
+    //Getter & Setter
+    //Behavior
 
 private:
     std::map<int, User*>            _users;
     std::map<std::string, Channel*> _channels;
-	std::vector<s_ChannelUserNode>  _ChannelUserTable;
+    std::vector<s_ChannelUserNode>  _ChannelUserTable;
 };
 
 //GLOBAL FUNCTION for class Database{}

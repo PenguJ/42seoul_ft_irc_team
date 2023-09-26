@@ -28,24 +28,24 @@ typedef struct UserMode
 class User
 {
 public:
-	//Constructor overload & OCCF
+    //Constructor overload & OCCF
     User(std::string &realname, std::string &nickname, \
         std::string &PWD, std::string &host, s_UserMode &mode);
-	~User();
-	//Exception
-	//Operator overload
-	//Getter & Setter
-	//Behavior
+    ~User();
+    //Exception
+    //Operator overload
+    //Getter & Setter
+    //Behavior
 
 private:
-	//Constructor overload & OCCF
-	User();
-	User& operator=(const User& rRhs);
-	User(const User& rCopy);
-	//Exception
-	//Operator overload
-	//Getter & Setter
-	//Behavior
+    //Constructor overload & OCCF
+    User();
+    User& operator=(const User& rRhs);
+    User(const User& rCopy);
+    //Exception
+    //Operator overload
+    //Getter & Setter
+    //Behavior
 
 private:
     std::string _realname;

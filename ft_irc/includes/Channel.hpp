@@ -35,23 +35,23 @@ typedef struct ChannelMode
 class Channel
 {
 public:
-	//Constructor overload & OCCF
+    //Constructor overload & OCCF
     Channel(std::string &topic, s_ChannelMode &mode);
-	~Channel();
-	//Exception
-	//Operator overload
-	//Getter & Setter
-	//Behavior
+    ~Channel();
+    //Exception
+    //Operator overload
+    //Getter & Setter
+    //Behavior
 
 private:
-	//Constructor overload & OCCF
-	Channel();
-	Channel& operator=(const Channel& rRhs);
-	Channel(const Channel& rCopy);
-	//Exception
-	//Operator overload
-	//Getter & Setter
-	//Behavior
+    //Constructor overload & OCCF
+    Channel();
+    Channel& operator=(const Channel& rRhs);
+    Channel(const Channel& rCopy);
+    //Exception
+    //Operator overload
+    //Getter & Setter
+    //Behavior
 
 private:
     std::string     _name;

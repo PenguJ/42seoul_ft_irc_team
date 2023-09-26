@@ -13,34 +13,34 @@
 //			대입연산자 주석 '있음'은 대게 멤버변수 동적할당 '없음'을 의미한다.
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
-	//PUBLIC:
+    //PUBLIC:
 Database::Database()
 {	}
 
 Database::~Database()
 {	}
 
-	//PRIVATE:
+    //PRIVATE:
 Database& Database::operator=(const Database& rRhs)
 {
-	std::cerr<<"error: never works"<<std::endl;
-	if (this == &rRhs)
-	{
-		return (*this);
-	}
-	/*
-	if || for (mPtrVAR || mRefVAR)
-	{
-		//delete mPtrVar || mRefVAR
-	}
-	*/
+    std::cerr<<"error: never works"<<std::endl;
+    if (this == &rRhs)
+    {
+        return (*this);
+    }
+    /*
+    if || for (mPtrVAR || mRefVAR)
+    {
+        //delete mPtrVar || mRefVAR
+    }
+    */
 
-	return (*this);
+    return (*this);
 }
 
 Database::Database(const Database& rCopy)
 {
-	std::cerr<<"error: never works"<<std::endl;
+    std::cerr<<"error: never works"<<std::endl;
     (void)rCopy;
 }
 
@@ -48,17 +48,17 @@ Database::Database(const Database& rCopy)
 
 //****************************************************************************/
 //Exception ******************************************************************/
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
 
 
 //****************************************************************************/
 //Operator overload **********************************************************/
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
 
 
@@ -68,21 +68,21 @@ Database::Database(const Database& rCopy)
 //			자료형에 따라 그 이상일 수 있다.
 //			그러나 둘 중 하나가 없는 경우, 명시적으로 표시한다.
 //			예를 들어, const가 아님에도 setter가 없다면, 클래스 외부에서 변경이 없음을 안다.
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
-	
+    
 
 //****************************************************************************/
 //Behavior *******************************************************************/
-	//PUBLIC:
+    //PUBLIC:
 void Database::clearAllInformationOfUser(const int FD)
 {
 (void)FD;
 }
 
-	//PRIVATE:
+    //PRIVATE:
 
 
 

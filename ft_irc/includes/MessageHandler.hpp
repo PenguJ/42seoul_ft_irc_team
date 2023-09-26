@@ -19,24 +19,24 @@
 class MessageHandler
 {
 public:
-	//Constructor overload & OCCF
+    //Constructor overload & OCCF
     MessageHandler(int FD, std::string &BUFF, Database * const pDB);
-	~MessageHandler();
-	//Exception
-	//Operator overload
-	//Getter & Setter
-	//Behavior
+    ~MessageHandler();
+    //Exception
+    //Operator overload
+    //Getter & Setter
+    //Behavior
     void run();
 
 private:
-	//Constructor overload & OCCF
-	MessageHandler();
-	MessageHandler(const MessageHandler& rCopy);
-	MessageHandler& operator=(const MessageHandler& rRhs);
-	//Exception
-	//Operator overload
-	//Getter & Setter
-	//Behavior
+    //Constructor overload & OCCF
+    MessageHandler();
+    MessageHandler(const MessageHandler& rCopy);
+    MessageHandler& operator=(const MessageHandler& rRhs);
+    //Exception
+    //Operator overload
+    //Getter & Setter
+    //Behavior
 
 private:
     const int           _FD;

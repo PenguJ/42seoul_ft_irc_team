@@ -13,68 +13,68 @@
 //			대입연산자 주석 '있음'은 대게 멤버변수 동적할당 '없음'을 의미한다.
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
-	//PUBLIC:
+    //PUBLIC:
 Server::Server(const u_int16_t &port, const std::string &PWD)
-	: _servSock(-1)
-	, _port(port)
-	, _PWD(PWD)
+    : _servSock(-1)
+    , _port(port)
+    , _PWD(PWD)
     , _pDB(NULL)
 {
-	const u_int8_t FIRST_SERVER_CAPACITY= 255;
+    const u_int8_t FIRST_SERVER_CAPACITY= 255;
 
-	_PFDS.reserve(FIRST_SERVER_CAPACITY);
+    _PFDS.reserve(FIRST_SERVER_CAPACITY);
 }
 
 Server::~Server()
 {   }
 
-	//PRIVATE:
+    //PRIVATE:
 Server::Server()
-	: _port(0)
+    : _port(0)
 {
-	std::cerr<<"error: never works"<<std::endl;
+    std::cerr<<"error: never works"<<std::endl;
 }
 
 Server& Server::operator=(const Server& rRhs)
 {
-	std::cerr<<"error: never works"<<std::endl;
+    std::cerr<<"error: never works"<<std::endl;
 
-	if (this == &rRhs)
-	{
-		return (*this);
-	}
-	/*
-	if || for (mPtrVAR || mRefVAR)
-	{
-		//delete mPtrVar || mRefVAR
-	}
-	*/
+    if (this == &rRhs)
+    {
+        return (*this);
+    }
+    /*
+    if || for (mPtrVAR || mRefVAR)
+    {
+        //delete mPtrVar || mRefVAR
+    }
+    */
 
-	return (*this);
+    return (*this);
 }
 
 Server::Server(const Server& rCopy)
-	: _port(0)
+    : _port(0)
 {
-	(void)rCopy;
-	std::cerr<<"error: never works"<<std::endl;
+    (void)rCopy;
+    std::cerr<<"error: never works"<<std::endl;
 }
 
 
 
 //****************************************************************************/
 //Exception ******************************************************************/
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
 
 
 //****************************************************************************/
 //Operator overload **********************************************************/
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
 
 
@@ -84,82 +84,82 @@ Server::Server(const Server& rCopy)
 //			자료형에 따라 그 이상일 수 있다.
 //			그러나 둘 중 하나가 없는 경우, 명시적으로 표시한다.
 //			예를 들어, const가 아님에도 setter가 없다면, 클래스 외부에서 변경이 없음을 안다.
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
-	
+    
 
 //****************************************************************************/
 //Behavior *******************************************************************/
-	//PUBLIC:
+    //PUBLIC:
 void Server::execute()
 {
 {	/* Open server: 
         server socket & Push Server socket to pollfds & allocate Database */
 {
-	_servSock = socket(AF_INET, SOCK_STREAM, 0);
-	if (_servSock < 0)
-	{
-		throw std::runtime_error("error: socket()");
-	}
+    _servSock = socket(AF_INET, SOCK_STREAM, 0);
+    if (_servSock < 0)
+    {
+        throw std::runtime_error("error: socket()");
+    }
 }
 {
-	int optVAL = 1;
+    int optVAL = 1;
 
-	if (setsockopt(_servSock, SOL_SOCKET, SO_REUSEADDR, &optVAL, sizeof(optVAL)))
-	{
-		throw std::runtime_error("error: setsockopt()");
-	}
+    if (setsockopt(_servSock, SOL_SOCKET, SO_REUSEADDR, &optVAL, sizeof(optVAL)))
+    {
+        throw std::runtime_error("error: setsockopt()");
+    }
 }
 {
-	if (fcntl(_servSock, F_SETFL, O_NONBLOCK))
-	{
-		throw std::runtime_error("error: fcntl()");
-	}
+    if (fcntl(_servSock, F_SETFL, O_NONBLOCK))
+    {
+        throw std::runtime_error("error: fcntl()");
+    }
 }
 {
-	SOCKADDR_IN servSockADDR;
+    SOCKADDR_IN servSockADDR;
 
-	memset(&servSockADDR, 0, sizeof(SOCKADDR_IN));
-	servSockADDR.sin_family = AF_INET;
-	servSockADDR.sin_addr.s_addr = INADDR_ANY;
-	servSockADDR.sin_port = htons(_port);
-	if (bind(_servSock, (SOCKADDR*)&servSockADDR, sizeof(servSockADDR)) < 0)
-	{
-		throw std::runtime_error("error: bind()");
-	}
+    memset(&servSockADDR, 0, sizeof(SOCKADDR_IN));
+    servSockADDR.sin_family = AF_INET;
+    servSockADDR.sin_addr.s_addr = INADDR_ANY;
+    servSockADDR.sin_port = htons(_port);
+    if (bind(_servSock, (SOCKADDR*)&servSockADDR, sizeof(servSockADDR)) < 0)
+    {
+        throw std::runtime_error("error: bind()");
+    }
 }
 {
-	const int BACKLOG = 100;
+    const int BACKLOG = 100;
 
-	if (listen(_servSock, BACKLOG) < 0)
-	{
-		throw std::runtime_error("error: listen()");
-	}
+    if (listen(_servSock, BACKLOG) < 0)
+    {
+        throw std::runtime_error("error: listen()");
+    }
 }
-	pollfd serv = {_servSock, POLLIN, 0};
+    pollfd serv = {_servSock, POLLIN, 0};
 
-	_PFDS.push_back(serv);
-	std::cout<<"[SERVER IS LISTENING...]"<<std::endl;
+    _PFDS.push_back(serv);
+    std::cout<<"[SERVER IS LISTENING...]"<<std::endl;
 }
 {
     _pDB = new Database;
 }
 {	// Run IRC-server Process
-	while (Server::bRunning)
-	{
-	    int eventFD = -1;
-	    std::vector<pollfd>::iterator iter = _PFDS.begin();
+    while (Server::bRunning)
+    {
+        int eventFD = -1;
+        std::vector<pollfd>::iterator iter = _PFDS.begin();
 
-		eventFD = poll(_PFDS.begin().base(), _PFDS.size(), -1);
-		if (eventFD <= 0)
-		{
-			throw std::runtime_error("error: poll()");
-		}
+        eventFD = poll(_PFDS.begin().base(), _PFDS.size(), -1);
+        if (eventFD <= 0)
+        {
+            throw std::runtime_error("error: poll()");
+        }
 
-		for (iter = _PFDS.begin(); iter != _PFDS.end(); ++iter)
-		{
+        for (iter = _PFDS.begin(); iter != _PFDS.end(); ++iter)
+        {
             const bool SERV_POLLIN = (iter->revents & POLLIN) && \
                                     (iter->fd == _servSock);
             const bool CLNT_POLLIN = (iter->revents & POLLIN) && \
@@ -208,8 +208,8 @@ void Server::execute()
                 _PFDS.erase(iter);
                 std::cout<<"[-]fd["<<iter->fd<<"]"<<" disconnected!"<<std::endl;
             }
-		}
-	}
+        }
+    }
 }
 {   // Close Server
     delete _pDB;
@@ -217,9 +217,9 @@ void Server::execute()
     {
         close (_PFDS[i].fd);
     }
-	close(_servSock);
-	_PFDS.clear();
-	std::vector<pollfd>().swap(_PFDS);
+    close(_servSock);
+    _PFDS.clear();
+    std::vector<pollfd>().swap(_PFDS);
 }
 }
 
@@ -235,12 +235,12 @@ void::Server::processExitError()
     {
         close (_PFDS[i].fd);
     }
-	close(_servSock);
-	_PFDS.clear();
-	std::vector<pollfd>().swap(_PFDS);
+    close(_servSock);
+    _PFDS.clear();
+    std::vector<pollfd>().swap(_PFDS);
 }
 
-	//PRIVATE:
+    //PRIVATE:
 
 
 

@@ -13,7 +13,7 @@
 //			대입연산자 주석 '있음'은 대게 멤버변수 동적할당 '없음'을 의미한다.
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
-	//PUBLIC:
+    //PUBLIC:
 Channel::Channel(std::string &topic, s_ChannelMode &mode)
     : _topic(topic)
     , _mode(mode)
@@ -22,32 +22,32 @@ Channel::Channel(std::string &topic, s_ChannelMode &mode)
 Channel::~Channel()
 {	}
 
-	//PRIVATE:
+    //PRIVATE:
 Channel::Channel()
 {
-	std::cerr<<"error: never works"<<std::endl;
+    std::cerr<<"error: never works"<<std::endl;
 }
 
 Channel& Channel::operator=(const Channel& rRhs)
 {
-	std::cerr<<"error: never works"<<std::endl;
-	if (this == &rRhs)
-	{
-		return (*this);
-	}
-	/*
-	if || for (mPtrVAR || mRefVAR)
-	{
-		//delete mPtrVar || mRefVAR
-	}
-	*/
+    std::cerr<<"error: never works"<<std::endl;
+    if (this == &rRhs)
+    {
+        return (*this);
+    }
+    /*
+    if || for (mPtrVAR || mRefVAR)
+    {
+        //delete mPtrVar || mRefVAR
+    }
+    */
 
-	return (*this);
+    return (*this);
 }
 
 Channel::Channel(const Channel& rCopy)
 {
-	std::cerr<<"error: never works"<<std::endl;
+    std::cerr<<"error: never works"<<std::endl;
     (void)rCopy;
 }
 
@@ -55,17 +55,17 @@ Channel::Channel(const Channel& rCopy)
 
 //****************************************************************************/
 //Exception ******************************************************************/
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
 
 
 //****************************************************************************/
 //Operator overload **********************************************************/
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
 
 
@@ -75,17 +75,17 @@ Channel::Channel(const Channel& rCopy)
 //			자료형에 따라 그 이상일 수 있다.
 //			그러나 둘 중 하나가 없는 경우, 명시적으로 표시한다.
 //			예를 들어, const가 아님에도 setter가 없다면, 클래스 외부에서 변경이 없음을 안다.
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
-	
+    
 
 //****************************************************************************/
 //Behavior *******************************************************************/
-	//PUBLIC:
+    //PUBLIC:
 
-	//PRIVATE:
+    //PRIVATE:
 
 
 
