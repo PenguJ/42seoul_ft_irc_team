@@ -25,22 +25,28 @@ typedef struct ChannelMode
     bool        bN; // no messages to channel from clients on the outside
     bool        bM; // moderated channel
     bool        bL; // set the user limit to channel
-    int         userLimit;
     bool        bB; // set a ban mask to keep users out
     bool        bV; // give/take the ability to speak on a moderated channel
     bool        bK; // set a channel key (password)
-    std::string channelkey;
+    int         userLimit; // by mode 'l'
+    std::string channelkey; // by mode 'k'
 }   s_ChannelMode;
 
 class Channel
 {
 public:
     //Constructor overload & OCCF
-    Channel(std::string &topic, s_ChannelMode &mode);
+    Channel(std::string& name, std::string &topic, s_ChannelMode &mode);
     ~Channel();
     //Exception
     //Operator overload
     //Getter & Setter
+    const std::string getName() const;
+    void setName(std::string& name);
+    const std::string getTopic() const;
+    void setTopic(std::string& topic);
+    s_ChannelMode getChannelMode() const;
+    void setChannelMode(s_ChannelMode& mode);
     //Behavior
 
 private:

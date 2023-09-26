@@ -30,7 +30,8 @@ class User
 public:
     //Constructor overload & OCCF
     User(std::string &realname, std::string &nickname, \
-        std::string &PWD, std::string &host, s_UserMode &mode);
+        std::string &PWD, std::string &host, s_UserMode &mode, \
+        bool& bAUTH, bool& bPWD);
     ~User();
     //Exception
     //Operator overload
@@ -45,6 +46,20 @@ private:
     //Exception
     //Operator overload
     //Getter & Setter
+    const std::string getRealname() const;
+    void setRealname(std::string& realname);
+    const std::string getNickname() const;
+    void setNickname(std::string& nickname);
+    const std::string getPassword() const;
+    void setPassword(std::string& PWD);
+    const std::string getHost() const;
+    void setHost(std::string& host);
+    s_UserMode getUserMode() const;
+    void setUserMode(s_UserMode& mode);
+    bool getBoolAuthority() const;
+    void setBoolAuthority(bool& bAUTH);
+    bool getBoolPassword() const;
+    void setBoolPassword(bool& bPWD);
     //Behavior
 
 private:
@@ -52,9 +67,9 @@ private:
     std::string _nickname;
     std::string _PWD;
     std::string _host;
-    bool        bAUTH;
-    bool        bPWD;
     s_UserMode  _mode;
+    bool        _bAUTH;
+    bool        _bPWD;
 };
 
 //GLOBAL FUNCTION for class User{}

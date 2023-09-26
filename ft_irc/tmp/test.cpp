@@ -1,14 +1,12 @@
 #include <iostream>
 #include <cstring>
 
-typedef struct A
-{
-    int a;
-}   s_A;
-
 int main()
 {
-    delete NULL;
+    int i = 10;
 
+    const int d = i;
+
+    std::cout<<d<<std::endl;
     return (0);
 }

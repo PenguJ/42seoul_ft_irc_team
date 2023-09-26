@@ -15,12 +15,14 @@
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
     //PUBLIC:
 User::User(std::string &realname, std::string &nickname, std::string &PWD, \
-        std::string &host, s_UserMode &mode)
+        std::string &host, s_UserMode &mode, bool& bAUTH, bool& bPWD)
     : _realname(realname)
     , _nickname(nickname)
     , _PWD(PWD)
     , _host(host)
     , _mode(mode)
+    , _bAUTH(bAUTH)
+    , _bPWD(bPWD)
 {   }
 
 User::~User()
@@ -80,6 +82,76 @@ User::User(const User& rCopy)
 //			그러나 둘 중 하나가 없는 경우, 명시적으로 표시한다.
 //			예를 들어, const가 아님에도 setter가 없다면, 클래스 외부에서 변경이 없음을 안다.
     //PUBLIC:
+const std::string User::getRealname() const
+{
+    return (_realname);
+}
+
+void User::setRealname(std::string& realname)
+{
+    _realname = realname;
+}
+
+const std::string User::getNickname() const
+{
+    return (_nickname);
+}
+
+void User::setNickname(std::string& nickname)
+{
+    _nickname = nickname;
+}
+
+const std::string User::getPassword() const
+{
+    return (_PWD);
+}
+
+void User::setPassword(std::string& PWD)
+{
+    _PWD = PWD;
+}
+
+const std::string User::getHost() const
+{
+    return (_host);
+}
+
+void User::setHost(std::string& host)
+{
+    _host = host;
+}
+
+s_UserMode User::getUserMode() const
+{
+    return (_mode);
+}
+
+void User::setUserMode(s_UserMode& mode)
+{
+    _mode = mode;
+}
+
+bool User::getBoolAuthority() const
+{
+    return (_bAUTH);
+}
+
+void User::setBoolAuthority(bool& bAUTH)
+{
+    _bAUTH = bAUTH;
+}
+
+bool User::getBoolPassword() const
+{
+    return (_bPWD);
+}
+
+void User::setBoolPassword(bool& bPWD)
+{
+    _bPWD = bPWD;
+}
+
 
     //PRIVATE:
 
