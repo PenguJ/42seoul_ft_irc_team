@@ -18,6 +18,7 @@ Server::Server(const u_int16_t &port, const std::string &PWD)
 	: _servSock(-1)
 	, _port(port)
 	, _PWD(PWD)
+    , _pDB(NULL)
 {
 	const u_int8_t FIRST_SERVER_CAPACITY= 255;
 
@@ -25,11 +26,7 @@ Server::Server(const u_int16_t &port, const std::string &PWD)
 }
 
 Server::~Server()
-{
-	close(_servSock);
-	_PFDS.clear();
-	std::vector<pollfd>().swap(_PFDS);
-}
+{   }
 
 	//PRIVATE:
 Server::Server()
@@ -98,7 +95,8 @@ Server::Server(const Server& rCopy)
 	//PUBLIC:
 void Server::execute()
 {
-{	// Open server - Create server socket & Push Server socket to pollfds
+{	/* Open server: 
+        server socket & Push Server socket to pollfds & allocate Database */
 {
 	_servSock = socket(AF_INET, SOCK_STREAM, 0);
 	if (_servSock < 0)
@@ -107,9 +105,9 @@ void Server::execute()
 	}
 }
 {
-	int optval = 1;
+	int optVAL = 1;
 
-	if (setsockopt(_servSock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
+	if (setsockopt(_servSock, SOL_SOCKET, SO_REUSEADDR, &optVAL, sizeof(optVAL)))
 	{
 		throw std::runtime_error("error: setsockopt()");
 	}
@@ -145,49 +143,101 @@ void Server::execute()
 	_PFDS.push_back(serv);
 	std::cout<<"[SERVER IS LISTENING...]"<<std::endl;
 }
+{
+    _pDB = new Database;
+}
 {	// Run IRC-server Process
-	int eventFD = -1;
-	std::vector<pollfd>::iterator iter = _PFDS.begin();
-
 	while (Server::bRunning)
 	{
-		eventFD = poll(_PFDS.begin().base(), _PFDS.size(), -1);
+	    int eventFD = -1;
+	    std::vector<pollfd>::iterator iter = _PFDS.begin();
 
+		eventFD = poll(_PFDS.begin().base(), _PFDS.size(), -1);
 		if (eventFD <= 0)
 		{
 			throw std::runtime_error("error: poll()");
 		}
+
 		for (iter = _PFDS.begin(); iter != _PFDS.end(); ++iter)
 		{
-			if (iter->revents == 0)
-			{
-				continue ;
-			}
-			else if (iter->revents & POLLIN)
-			{
-				if (iter->fd == _servSock)      // accept client
-				{
-					int ClntFD = -1;
+            const bool SERV_POLLIN = (iter->revents & POLLIN) && \
+                                    (iter->fd == _servSock);
+            const bool CLNT_POLLIN = (iter->revents & POLLIN) && \
+                                    (iter->fd != _servSock);
+            const bool CLNT_POLLHUP = iter->revents & POLLHUP;
 
-				}
-				else                            // response handling
-				{
-                    const char cBufLEN = 1024;
-					// interpret IRC CMD_MSG
+            if (SERV_POLLIN)
+            {
+                SOCKADDR_IN ADDR;
+                socklen_t AddrLEN = sizeof(ADDR);
+                int clntFD = accept(_servSock, (SOCKADDR*)&ADDR, &AddrLEN);
+                // ERR CHECK
+                std::cout<<"[+]fd["<<clntFD<<"]"<<" accepted!"<<std::endl;
 
+                pollfd clnt = {clntFD, POLLIN, 0};
 
-				}
-			}
-			else if (iter->revents & POLLHUP)   // disconnect client
-			{
-				// disconnect process
-				// careful FD, vector, map, memory
-			}
+                _PFDS.push_back(clnt);
+            }
+            else if (CLNT_POLLIN)
+            {
+                char cBUFF[MAX_MSG_LEN] = {0, };
+                std::string BUFF;
+                ssize_t retVAL = 1;
+
+                retVAL = recv(iter->fd, cBUFF, MAX_MSG_LEN, 0);
+                switch (retVAL)
+                {
+                case -1:
+                /* if exist ErrCode about bad condition of server, then send */
+                    break ;
+                case 0:
+                    break ;
+                default:
+                    BUFF = cBUFF;
+
+                    MessageHandler msgHandler(iter->fd, BUFF, _pDB);
+
+                    msgHandler.run();
+                    break ;
+                }
+            }
+            else if (CLNT_POLLHUP)
+            {
+                _pDB->clearAllInformationOfUser(iter->fd);
+                close(iter->fd);
+                _PFDS.erase(iter);
+                std::cout<<"[-]fd["<<iter->fd<<"]"<<" disconnected!"<<std::endl;
+            }
 		}
-
-		// timeout ping-pong
 	}
 }
+{   // Close Server
+    delete _pDB;
+    for (size_t i = 0; i < _PFDS.size(); ++i)
+    {
+        close (_PFDS[i].fd);
+    }
+	close(_servSock);
+	_PFDS.clear();
+	std::vector<pollfd>().swap(_PFDS);
+}
+}
+
+void::Server::processExitError()
+{
+    if (_servSock == -1)
+        return ;
+    if (_pDB)
+    {
+        delete _pDB;
+    }
+    for (size_t i = 0; i < _PFDS.size(); ++i)
+    {
+        close (_PFDS[i].fd);
+    }
+	close(_servSock);
+	_PFDS.clear();
+	std::vector<pollfd>().swap(_PFDS);
 }
 
 	//PRIVATE:

@@ -1,12 +1,19 @@
 //#pragma once
 #ifndef DATABASE_HPP
-# define DARABASE_HPP
+# define DATABASE_HPP
 
 # include <iostream>
 # include <map>
 # include <vector>
 # include "Channel.hpp"
 # include "User.hpp"
+
+typedef struct ChannelUserNode
+{
+	std::map<std::string, Channel*>*    _channel;
+	std::map<int, User*>*               _user;
+	bool                                _bOP;
+}	s_ChannelUserNode;
 
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
 //				멤버변수를 public으로 선언할 수 있다.
@@ -20,28 +27,22 @@
 // is do inherit? (NO): is abstracted? (NO): is interface? (NO)
 // is be inherited? (NO)
 
-typedef struct ChannelUserNode
-{
-	std::map<std::string, Channel*>*    _channel;
-	std::map<int, User*>*               _user;
-	bool                                _bOP;
-}	s_ChannelUserNode;
-
 class Database
 {
 public:
 	//Constructor overload & OCCF
 	Database();
 	~Database();
-	Database& operator=(const Database& rRhs);
-	Database(const Database& rCopy);
 	//Exception
 	//Operator overload
 	//Getter & Setter
 	//Behavior
+    void clearAllInformationOfUser(const int FD);
 
 private:
 	//Constructor overload & OCCF
+	Database& operator=(const Database& rRhs);
+	Database(const Database& rCopy);
 	//Exception
 	//Operator overload
 	//Getter & Setter

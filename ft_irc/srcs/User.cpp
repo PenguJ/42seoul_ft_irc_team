@@ -52,6 +52,7 @@ User& User::operator=(const User& rRhs)
 User::User(const User& rCopy)
 {
 	std::cerr<<"error: never works"<<std::endl;
+    (void)rCopy;
 }
 
 

@@ -97,6 +97,7 @@ int main(int argc, char* argv[])
     }
     catch(const std::exception& e)
     {
+        ircserv.processExitError();
         std::cerr << e.what() << std::endl;
 
         return (EXIT_FAILURE);

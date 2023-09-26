@@ -1,4 +1,4 @@
-#include "../includes/Message.hpp"
+#include "../includes/MessageHandler.hpp"
 
 //STANDARD: (순수)가상함수는 주석과 함께 명시적으로 정의한다. 양식은 다음과 같다.
 //				/*virtual*/void Bar::Baz() {...}
@@ -14,24 +14,24 @@
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
 	//PUBLIC:
-Message::Message(const int FD, std::string &BUFF, Database * const DB)
+MessageHandler::MessageHandler(int FD, std::string &BUFF, Database * const pDB)
     : _FD(FD)
     , _BUFF(BUFF)
-    , _DB(DB)
+    , _pDB(pDB)
 {   }
 
-Message::~Message()
+MessageHandler::~MessageHandler()
 {	}
 
 	//PRIVATE:
-Message::Message()
+MessageHandler::MessageHandler()
     : _FD(0)
-    , _DB(NULL)
+    , _pDB(NULL)
 {
 	std::cerr<<"error: never works"<<std::endl;
 }
 
-Message& Message::operator=(const Message& rRhs)
+MessageHandler& MessageHandler::operator=(const MessageHandler& rRhs)
 {
 	std::cerr<<"error: never works"<<std::endl;
 	if (this == &rRhs)
@@ -48,11 +48,12 @@ Message& Message::operator=(const Message& rRhs)
 	return (*this);
 }
 
-Message::Message(const Message& rCopy)
+MessageHandler::MessageHandler(const MessageHandler& rCopy)
     : _FD(0)
-    , _DB(NULL)
+    , _pDB(NULL)
 {
 	std::cerr<<"error: never works"<<std::endl;
+    (void)rCopy;
 }
 
 
@@ -88,6 +89,10 @@ Message::Message(const Message& rCopy)
 //****************************************************************************/
 //Behavior *******************************************************************/
 	//PUBLIC:
+void MessageHandler::run()
+{
+
+}
 
 	//PRIVATE:
 

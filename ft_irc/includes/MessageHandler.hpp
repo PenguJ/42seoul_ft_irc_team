@@ -1,6 +1,6 @@
 //#pragma once
-#ifndef MESSAGE_HPP
-# define MESSAGE_HPP
+#ifndef MESSAGE_HANDLER_HPP
+# define MESSAGE_HANDLER_HPP
 
 # include <iostream>
 # include "../includes/Database.hpp"
@@ -16,22 +16,23 @@
 // 			상속을 하거나, 받으면 해당 클래스를 들여쓰기로 한 줄씩 명시한다.
 // is do inherit? (NO): is abstracted? (NO): is interface? (NO)
 // is be inherited? (NO)
-class Message
+class MessageHandler
 {
 public:
 	//Constructor overload & OCCF
-    Message(const int FD, std::string &BUFF, Database * const DB);
-	Message(const Message& rCopy);
+    MessageHandler(int FD, std::string &BUFF, Database * const pDB);
+	~MessageHandler();
 	//Exception
 	//Operator overload
 	//Getter & Setter
 	//Behavior
+    void run();
 
 private:
 	//Constructor overload & OCCF
-	Message();
-	~Message();
-	Message& operator=(const Message& rRhs);
+	MessageHandler();
+	MessageHandler(const MessageHandler& rCopy);
+	MessageHandler& operator=(const MessageHandler& rRhs);
 	//Exception
 	//Operator overload
 	//Getter & Setter
@@ -40,9 +41,9 @@ private:
 private:
     const int           _FD;
     std::string         _BUFF;
-    Database * const    _DB;
+    Database * const    _pDB;
 };
 
-//GLOBAL FUNCTION for class Message{}
+//GLOBAL FUNCTION for class MessageHandler{}
 
 #endif

@@ -5,7 +5,12 @@ INCLUDESDIR = ./includes/
 SRCSDIR = ./srcs/
 SRCS = $(addprefix $(SRCSDIR), \
 			main.cpp \
-			Server.cpp)
+			Channel.cpp \
+			Database.cpp \
+			MessageHandler.cpp \
+			Server.cpp \
+			User.cpp \
+			)
 OBJS = $(SRCS:.cpp=.o)
 RM = rm -f
 

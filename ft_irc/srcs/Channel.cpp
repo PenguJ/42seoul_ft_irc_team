@@ -48,6 +48,7 @@ Channel& Channel::operator=(const Channel& rRhs)
 Channel::Channel(const Channel& rCopy)
 {
 	std::cerr<<"error: never works"<<std::endl;
+    (void)rCopy;
 }
 
 

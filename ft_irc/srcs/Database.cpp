@@ -1,4 +1,4 @@
-#include "Database.hpp"
+#include "../includes/Database.hpp"
 
 //STANDARD: (순수)가상함수는 주석과 함께 명시적으로 정의한다. 양식은 다음과 같다.
 //				/*virtual*/void Bar::Baz() {...}
@@ -20,8 +20,10 @@ Database::Database()
 Database::~Database()
 {	}
 
+	//PRIVATE:
 Database& Database::operator=(const Database& rRhs)
 {
+	std::cerr<<"error: never works"<<std::endl;
 	if (this == &rRhs)
 	{
 		return (*this);
@@ -37,9 +39,10 @@ Database& Database::operator=(const Database& rRhs)
 }
 
 Database::Database(const Database& rCopy)
-{	}
-
-	//PRIVATE:
+{
+	std::cerr<<"error: never works"<<std::endl;
+    (void)rCopy;
+}
 
 
 
@@ -74,6 +77,10 @@ Database::Database(const Database& rCopy)
 //****************************************************************************/
 //Behavior *******************************************************************/
 	//PUBLIC:
+void Database::clearAllInformationOfUser(const int FD)
+{
+(void)FD;
+}
 
 	//PRIVATE:
 
