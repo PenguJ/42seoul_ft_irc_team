@@ -24,7 +24,16 @@ Database::Database()
 }
 
 Database::~Database()
-{	}
+{
+    _users.clear();
+    UserPairVector().swap(_users);
+
+    _channels.clear();
+    ChannelPairVector().swap(_channels);
+
+    _channelUserTable.clear();
+    ChannelUserTable().swap(_channelUserTable);
+}
 
     //PRIVATE:
 Database& Database::operator=(const Database& rRhs)
@@ -83,8 +92,31 @@ Database::Database(const Database& rCopy)
 //****************************************************************************/
 //Behavior *******************************************************************/
     //PUBLIC:
+void Database::clearDatabase()
+{
+    for (size_t i = 0; i < _users.size(); ++i)
+    {
+        _users[i].first = -1;
+        delete _users[i].second;
+        _users[i].second = NULL;
+    }
+    for (size_t i = 0; i < _channels.size(); ++i)
+    {
+        _channels[i].first.clear();
+        delete _channels[i].second;
+        _channels[i].second = NULL;
+    }
+    for (size_t i = 0; i < _channelUserTable.size(); ++i)
+    {
+        _channelUserTable[i]._user = NULL;
+        _channelUserTable[i]._channel = NULL;
+        _channelUserTable[i]._bOP = false;
+    }
+}
+
 void Database::clearAllInformationOfUser(const int FD)
 {
+
 (void)FD;
 }
 

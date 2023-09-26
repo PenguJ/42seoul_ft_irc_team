@@ -44,6 +44,7 @@ public:
     //Operator overload
     //Getter & Setter
     //Behavior
+    void clearDatabase();
     void clearAllInformationOfUser(const int FD);
 
 private:

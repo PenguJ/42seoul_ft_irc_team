@@ -222,6 +222,7 @@ void Server::execute()
     }
 }
 {   // Close Server
+    _pDB->clearDatabase();
     delete _pDB;
     for (size_t i = 0; i < _PFDS.size(); ++i)
     {
@@ -239,6 +240,7 @@ void::Server::processExitError()
         return ;
     if (_pDB)
     {
+        _pDB->clearDatabase();
         delete _pDB;
     }
     for (size_t i = 0; i < _PFDS.size(); ++i)
