@@ -14,9 +14,10 @@
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
     //PUBLIC:
-User::User(std::string &realname, std::string &nickname, std::string &PWD, \
+User::User(int FD, std::string &realname, std::string &nickname, std::string &PWD, \
         std::string &host, s_UserMode &mode, bool& bAUTH, bool& bPWD)
-    : _realname(realname)
+    : _FD(FD)
+    , _realname(realname)
     , _nickname(nickname)
     , _PWD(PWD)
     , _host(host)
@@ -82,6 +83,11 @@ User::User(const User& rCopy)
 //			그러나 둘 중 하나가 없는 경우, 명시적으로 표시한다.
 //			예를 들어, const가 아님에도 setter가 없다면, 클래스 외부에서 변경이 없음을 안다.
     //PUBLIC:
+int User::getFD() const
+{
+    return (_FD);
+}
+
 const std::string User::getRealname() const
 {
     return (_realname);

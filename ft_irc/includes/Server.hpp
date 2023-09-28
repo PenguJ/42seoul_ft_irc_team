@@ -37,7 +37,7 @@ class Server
 {
 public:
     //Constructor overload & OCCF
-    Server(const u_int16_t &port, const std::string &PWD);
+    Server();
     ~Server();
     //Exception
     //Operator overload
@@ -48,7 +48,6 @@ public:
 
 private:
     //Constructor overload & OCCF
-    Server();
     Server& operator=(const Server& rRhs);
     Server(const Server& rCopy);
     //Exception
@@ -67,85 +66,18 @@ public:
 
     // server state
     static bool                     bRunning;
+    static std::string              ServPWD;
+    static u_int16_t                Port;
+    static std::string              PortSTR;
+    static std::string              Host;
 
 private:
     int                             _servSock;
-    const u_int16_t                 _port;
-    const std::string               _PWD;
     std::vector<pollfd>             _PFDS;
     Database*                       _pDB;
 };
 
 //GLOBAL FUNCTION for class Server{}
 
-
-    // /* command responses 
-    //     0 - 99 : client-server connections only, never travel between servers.
-    //     200 - 399 : replies generated in the response to commands.
-    //     400 - 599 : error replies. */
-    // /* 001 - 004 : the server sends replies to a user upon successful registration. */
-    // static const u_int16_t          RPL_WELCOME = 1;
-    // static const u_int16_t          RPL_YOURHOST = 2;
-    // static const u_int16_t          RPL_CREATED = 3;
-    // static const u_int16_t          RPL_MYINFO = 4;
-    // /* 005 : Sent by the server to a user to suggest an alternative server.  This is often used when the connection is refused because the server is already full. */
-    // static const u_int16_t          RPL_BOUNCE = 5;
-
-
-
-
-    // // static const u_int16_t          ERR_NOSUCHNICK = 401;
-    // static const u_int16_t          ERR_NOSUCHSERVER = 402;
-    // static const u_int16_t          ERR_NOSUCHCHANNEL = 403;
-    // static const u_int16_t          ERR_CANNOTSENDTOCHAN = 404;
-    // static const u_int16_t          ERR_TOOMANYCHANNELS = 405;
-    // static const u_int16_t          ERR_WASNOSUCHNICK = 406;
-    // static const u_int16_t          ERR_TOOMANYTARGETS = 407;
-    // static const u_int16_t          ERR_NOSUCHSERVICE = 408;
-    // static const u_int16_t          ERR_NOORIGIN = 409;
-    // static const u_int16_t          ERR_NORECIPIENT = 411;
-    // static const u_int16_t          ERR_NOTEXTTOSEND = 412;
-    // static const u_int16_t          ERR_NOTOPLEVEL = 413;
-    // static const u_int16_t          ERR_WILDTOPLEVEL = 414;
-    // static const u_int16_t          ERR_BADMASK = 415;
-    // static const u_int16_t          ERR_UNKNOWNCOMMAND = 421;
-    // static const u_int16_t          ERR_NOMOTD = 422;
-    // static const u_int16_t          ERR_NOADMININFO = 423;
-    // static const u_int16_t          ERR_FILEERROR = 424;
-    // static const u_int16_t          ERR_NONICKNAMEGIVEN = 431;
-    // static const u_int16_t          ERR_ERRONEUSNICKNAME = 432;
-    // static const u_int16_t          ERR_NICKNAMEINUSE = 433;
-    // static const u_int16_t          ERR_NICKCOLLISION = 436;
-    // static const u_int16_t          ERR_UNAVAILRESOURCE = 437;
-    // static const u_int16_t          ERR_USERNOTINCHANNEL = 441;
-    // static const u_int16_t          ERR_NOTONCHANNEL = 442;
-    // static const u_int16_t          ERR_USERONCHANNEL = 443;
-    // static const u_int16_t          ERR_NOLOGIN = 444;
-    // static const u_int16_t          ERR_SUMMONDISABLED = 445;
-    // static const u_int16_t          ERR_USERSDISABLED = 446;
-    // static const u_int16_t          ERR_NOTREGISTERED = 451;
-    // static const u_int16_t          ERR_NEEDMOREPARAMS = 461;
-    // static const u_int16_t          ERR_ALREADYREGISTRED = 462;
-    // static const u_int16_t          ERR_NOPERMFORHOST = 463;
-    // static const u_int16_t          ERR_PASSWDMISMATCH = 464;
-    // static const u_int16_t          ERR_YOUREBANNEDCREEP = 465;
-    // static const u_int16_t          ERR_YOUWILLBEBANNED = 466;
-    // static const u_int16_t          ERR_KEYSET = 467;
-    // static const u_int16_t          ERR_CHANNELISFULL = 471;
-    // static const u_int16_t          ERR_UNKNOWNMODE = 472;
-    // static const u_int16_t          ERR_INVITEONLYCHAN = 473;
-    // static const u_int16_t          ERR_BANNEDFROMCHAN = 474;
-    // static const u_int16_t          ERR_BADCHANNELKEY = 475;
-    // static const u_int16_t          ERR_BADCHANMASK = 476;
-    // static const u_int16_t          ERR_NOCHANMODES = 477;
-    // static const u_int16_t          ERR_BANLISTFULL = 478;
-    // static const u_int16_t          ERR_NOPRIVILEGES = 481;
-    // static const u_int16_t          ERR_CHANOPRIVSNEEDED = 482;
-    // static const u_int16_t          ERR_CANTKILLSERVER = 483;
-    // static const u_int16_t          ERR_RESTRICTED = 484;
-    // static const u_int16_t          ERR_UNIQOPPRIVSNEEDED = 485;
-    // static const u_int16_t          ERR_NOOPERHOST = 491;
-    // static const u_int16_t          ERR_UMODEUNKNOWNFLAG = 501;
-    // static const u_int16_t          ERR_USERSDONTMATCH = 502;
 
 #endif

@@ -1,6 +1,10 @@
 #include "../includes/Irc.hpp"
 
 bool Server::bRunning = true;
+std::string Server::ServPWD;
+std::string Server::Host = "pythonIRC";
+u_int16_t Server::Port = 0;
+std::string Server::PortSTR;
 
 static void HandleSIGINT(int)
 {
@@ -84,8 +88,11 @@ int main(int argc, char* argv[])
         return (EXIT_FAILURE);
     }
 }
-    const u_int16_t port = (u_int16_t)atoi(argv[1]);
-    Server ircserv(port, argv[2]);
+    Server::Port = (u_int16_t)atoi(argv[1]);
+    Server::PortSTR = argv[1];
+    Server::ServPWD = argv[2];
+
+    Server ircserv;
 
     signal(SIGINT, HandleSIGINT);
     // try-catch는 오직 여기서만 사용됩니다.

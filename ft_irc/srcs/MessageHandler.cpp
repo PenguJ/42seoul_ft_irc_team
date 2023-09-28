@@ -91,7 +91,7 @@ MessageHandler::MessageHandler(const MessageHandler& rCopy)
     //PUBLIC:
 void MessageHandler::run()
 {
-
+    std::cout<<"FD["<<_FD<<"]: "<<_BUFF<<std::endl;
 }
 
     //PRIVATE:

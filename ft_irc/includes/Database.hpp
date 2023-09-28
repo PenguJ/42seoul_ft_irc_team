@@ -15,8 +15,8 @@ typedef std::vector<ChannelPair>            ChannelPairVector;
 
 typedef struct ChannelUserNode
 {
-    UserPair*       _user;
-    ChannelPair*    _channel;
+    UserPair*       _pUserPair;
+    ChannelPair*    _pChannelPair;
     bool            _bOP;
 }	s_ChannelUserNode;
 
@@ -44,8 +44,27 @@ public:
     //Operator overload
     //Getter & Setter
     //Behavior
-    void clearDatabase();
-    void clearAllInformationOfUser(const int FD);
+    void clearDatabase(); // DB clear before exit server
+    void addUserAtPairVec(int& FD, \
+                            std::string& realname, \
+                            std::string& nickname, \
+                            std::string& PWD, \
+                            std::string& host, \
+                            s_UserMode& mode, \
+                            bool& bAUTH, \
+                            bool& bPWD); // when user accepted at server, but not a channel
+    void clearUserAtDatabase(int& FD); // when user quit at server
+    void createChannelAtDatabase(User* pMaker, \
+                                    std::string& name, \
+                                    std::string& topic, \
+                                    s_ChannelMode& mode); // when some user create a channel
+    void clearChannelAtDatabase(std::string& name); // when last user leave a channel
+    void joinChannel(int& FD, std::string& chanName); // when some user join channel already exist
+    void leaveChannel(int& FD, std::string& chanName); // when some user leave channel already exist
+
+    bool isOP(std::string& chanName, std::string& userNick);
+    User* searchUser(std::string& nickname);
+    Channel* searchChannel(std::string& chanName);
 
 private:
     //Constructor overload & OCCF

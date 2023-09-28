@@ -14,10 +14,8 @@
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
     //PUBLIC:
-Server::Server(const u_int16_t &port, const std::string &PWD)
+Server::Server()
     : _servSock(-1)
-    , _port(port)
-    , _PWD(PWD)
     , _pDB(NULL)
 {
     const u_int8_t FIRST_SERVER_CAPACITY= 255;
@@ -29,12 +27,6 @@ Server::~Server()
 {   }
 
     //PRIVATE:
-Server::Server()
-    : _port(0)
-{
-    std::cerr<<"error: never works"<<std::endl;
-}
-
 Server& Server::operator=(const Server& rRhs)
 {
     std::cerr<<"error: never works"<<std::endl;
@@ -54,7 +46,6 @@ Server& Server::operator=(const Server& rRhs)
 }
 
 Server::Server(const Server& rCopy)
-    : _port(0)
 {
     (void)rCopy;
     std::cerr<<"error: never works"<<std::endl;
@@ -124,7 +115,7 @@ void Server::execute()
     memset(&servSockADDR, 0, sizeof(SOCKADDR_IN));
     servSockADDR.sin_family = AF_INET;
     servSockADDR.sin_addr.s_addr = INADDR_ANY;
-    servSockADDR.sin_port = htons(_port);
+    servSockADDR.sin_port = htons(Port);
     if (bind(_servSock, (SOCKADDR*)&servSockADDR, sizeof(servSockADDR)) < 0)
     {
         throw std::runtime_error("error: bind()");
@@ -202,7 +193,7 @@ void Server::execute()
                     goto ESCAPE_EVENT_SEARCHING_LOOP;
                 case 0:
                     std::cout<<"[-] fd: "<<iter->fd<<": disconnected!"<<std::endl;
-                    _pDB->clearAllInformationOfUser(iter->fd);
+                    _pDB->clearUserAtDatabase(iter->fd);
                     close(iter->fd);
                     _PFDS.erase(iter);
                     

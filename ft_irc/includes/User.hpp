@@ -29,23 +29,15 @@ class User
 {
 public:
     //Constructor overload & OCCF
-    User(std::string &realname, std::string &nickname, \
+    User(int FD, std::string &realname, std::string &nickname, \
         std::string &PWD, std::string &host, s_UserMode &mode, \
         bool& bAUTH, bool& bPWD);
     ~User();
     //Exception
     //Operator overload
     //Getter & Setter
-    //Behavior
-
-private:
-    //Constructor overload & OCCF
-    User();
-    User& operator=(const User& rRhs);
-    User(const User& rCopy);
-    //Exception
-    //Operator overload
-    //Getter & Setter
+    int getFD() const;
+        // void setFD(int); (needless)
     const std::string getRealname() const;
     void setRealname(std::string& realname);
     const std::string getNickname() const;
@@ -63,6 +55,17 @@ private:
     //Behavior
 
 private:
+    //Constructor overload & OCCF
+    User();
+    User& operator=(const User& rRhs);
+    User(const User& rCopy);
+    //Exception
+    //Operator overload
+    //Getter & Setter
+    //Behavior
+
+private:
+    int         _FD;
     std::string _realname;
     std::string _nickname;
     std::string _PWD;
