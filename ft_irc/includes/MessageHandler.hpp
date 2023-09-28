@@ -3,7 +3,12 @@
 # define MESSAGE_HANDLER_HPP
 
 # include <iostream>
+# include <vector>
+
+# include "../includes/Channel.hpp"
 # include "../includes/Database.hpp"
+# include "../includes/Server.hpp"
+# include "../includes/User.hpp"
 
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
 //				멤버변수를 public으로 선언할 수 있다.
@@ -16,6 +21,15 @@
 // 			상속을 하거나, 받으면 해당 클래스를 들여쓰기로 한 줄씩 명시한다.
 // is do inherit? (NO): is abstracted? (NO): is interface? (NO)
 // is be inherited? (NO)
+
+typedef struct Command
+{
+    std::string                 prefix;
+    std::string                 command;
+    std::vector<std::string>    parameters;
+    std::string                 suffix;
+}   s_Command;
+
 class MessageHandler
 {
 public:
@@ -37,6 +51,7 @@ private:
     //Operator overload
     //Getter & Setter
     //Behavior
+    std::vector<std::string> split(const std::string& STR, char DL);
 
 private:
     const int           _FD;
