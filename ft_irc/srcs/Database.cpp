@@ -96,6 +96,7 @@ void Database::clearDatabase()
 {
     for (size_t i = 0; i < _users.size(); ++i)
     {
+        close(_users[i].first);
         _users[i].first = -1;
         delete _users[i].second;
         _users[i].second = NULL;
@@ -164,6 +165,7 @@ void Database::clearUserAtDatabase(int& FD)
         }
         else if (iter->first == FD)
         {
+            close(iter->first);
             delete iter->second;
             _users.erase(iter);
             break ;

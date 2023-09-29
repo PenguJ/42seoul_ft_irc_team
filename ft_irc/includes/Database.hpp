@@ -2,6 +2,8 @@
 #ifndef DATABASE_HPP
 # define DATABASE_HPP
 
+# include <unistd.h>
+
 # include <iostream>
 # include <vector>
 # include "Channel.hpp"
