@@ -96,13 +96,13 @@ void Database::clearDatabase()
 {
     for (size_t i = 0; i < _users.size(); ++i)
     {
-        close(_users[i].first);
         _users[i].first = -1;
         delete _users[i].second;
         _users[i].second = NULL;
     }
     for (size_t i = 0; i < _channels.size(); ++i)
     {
+        close(_users[i].first);
         _channels[i].first.clear();
         delete _channels[i].second;
         _channels[i].second = NULL;
@@ -115,19 +115,23 @@ void Database::clearDatabase()
     }
 }
 
-void Database::addUserAtPairVec(int& FD, 
-                                std::string& realname, \
-                                std::string& nickname, \
-                                std::string& PWD, \
-                                std::string& host, \
-                                s_UserMode& mode, \
-                                bool& bAUTH, \
-                                bool& bPWD)
+void Database::addUserAtPairVec(int FD, 
+                                std::string realname, \
+                                std::string nickname, \
+                                std::string username, \
+                                std::string PWD, \
+                                std::string host, \
+                                bool bI, \
+                                bool bS, \
+                                bool bW, \
+                                bool bO, \
+                                bool bAUTH, \
+                                bool bPWD)
 {
     UserPair tmp;
 
     tmp.first = FD;
-    tmp.second = new User(FD, realname, nickname, PWD, host, mode, bAUTH, bPWD);
+    tmp.second = new User(FD, realname, nickname, username, PWD, host, bI, bS, bW, bO, bAUTH, bPWD);
 
     _users.push_back(tmp);
 }
@@ -293,6 +297,7 @@ void Database::leaveChannel(int& FD, std::string& chanName)
     }
 }
 
+
 eIsUserAtChannel Database::isUserAtChannel(std::string& chanName, \
                                             std::string& userNick)
 {
@@ -324,6 +329,17 @@ User* Database::searchUser(std::string& nickname)
             return (_users[i].second);
     }
 
+    return (NULL);
+}
+
+User *Database::searchUser(const int &FD)
+{
+    for (size_t i = 0; i < _users.size(); ++i)
+    {
+        if (_users[i].first == FD)
+            return (_users[i].second);
+    }
+    
     return (NULL);
 }
 

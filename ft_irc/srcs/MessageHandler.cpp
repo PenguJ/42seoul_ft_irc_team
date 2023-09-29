@@ -1,6 +1,61 @@
 #include <sstream>
 #include "../includes/MessageHandler.hpp"
 
+
+
+const std::string MessageHandler::ENDL = "\r\n";
+const std::string MessageHandler::COL = ":";
+const std::string MessageHandler::SPACE = " ";
+const std::string MessageHandler::AST = "*";
+const std::string MessageHandler::RPL_WELCOME = "001";
+const std::string MessageHandler::ERR_UNKNOWNERROR = "400";
+const std::string MessageHandler::ERR_NOSUCHNICK = "401";
+const std::string MessageHandler::ERR_NOSUCHNICK_MSG = " :No such nick/channel";
+const std::string MessageHandler::ERR_NOSUCHSERVER = "402";
+const std::string MessageHandler::ERR_NOSUCHCHANNEL = "403";
+const std::string MessageHandler::ERR_NOSUCHCHANNEL_MSG = " :No such channel";
+const std::string MessageHandler::ERR_CANNOTSENDTOCHAN = "404";
+const std::string MessageHandler::ERR_TOOMANYCHANNELS = "405";
+const std::string MessageHandler::ERR_NOORIGIN = "409";
+const std::string MessageHandler::ERR_NOORIGIN_MSG = " :No origin specified";
+const std::string MessageHandler::ERR_NORECIPIENT = "411";
+const std::string MessageHandler::ERR_NORECIPIENT_MSG = " :No recipient given";
+const std::string MessageHandler::ERR_NOTEXTTOSEND = "412";
+const std::string MessageHandler::ERR_NOTEXTTOSEND_MSG = " :No text to send";
+
+const std::string MessageHandler::ERR_UNKNOWNCOMMAND = "421";
+const std::string MessageHandler::ERR_UNKNOWNCOMMAND_MSG = " :Unknown command";
+
+const std::string MessageHandler::ERR_NONICKNAMEGIVEN = "431";
+const std::string MessageHandler::ERR_NONICKNAMEGIVEN_MSG = " :No nickname given";
+const std::string MessageHandler::ERR_ERRONEUSNICKNAME = "432";
+const std::string MessageHandler::ERR_ERRONEUSNICKNAME_MSG = " :Erroneous nickname";
+const std::string MessageHandler::ERR_NICKNAMEINUSE = "433";
+const std::string MessageHandler::ERR_NICKNAMEINUSE_MSG = " :Nickname is already in use";
+const std::string MessageHandler::ERR_UNAVAILRESOURCE = "437";
+const std::string MessageHandler::ERR_UNAVAILRESOURCE_MSG = " :Channel is temporarily unavailable";
+
+const std::string MessageHandler::ERR_USERNOTINCHANNEL = "441";
+const std::string MessageHandler::ERR_USERNOTINCHANNEL_MSG = " :They aren't on that channel";
+const std::string MessageHandler::ERR_NOTONCHANNEL = "442";
+const std::string MessageHandler::ERR_NOTONCHANNEL_MSG = " :You're not on that channel";
+const std::string MessageHandler::ERR_USERONCHANNEL = "443";
+
+const std::string MessageHandler::ERR_NOTREGISTERED = "451";
+const std::string MessageHandler::ERR_NOTREGISTERED_MSG = ":You have not registered";
+const std::string MessageHandler::ERR_NEEDMOREPARAMS = "461";
+const std::string MessageHandler::ERR_NEEDMOREPARAMS_MSG = " :Not enough parameters";
+const std::string MessageHandler::ERR_ALREADYREGISTERED = "462";
+const std::string MessageHandler::ERR_ALREADYREGISTERED_MSG = " :You may not reregister";
+const std::string MessageHandler::ERR_PASSWDMISMATCH = "464";
+const std::string MessageHandler::ERR_PASSWDMISMATCH_MSG = " :Password incorrect";
+
+const std::string MessageHandler::ERR_CHANNELISFULL = "471";
+const std::string MessageHandler::ERR_ERRONEUSCHANNELNAME = "479";
+const std::string MessageHandler::ERR_ERRONEUSCHANNELNAME_MSG = " :Channel name contains illegal characters";
+const std::string MessageHandler::ERR_CHANOPRIVSNEEDED = "482";
+const std::string MessageHandler::ERR_CHANOPRIVSNEEDED_MSG = " :You're not channel operator";
+
 //STANDARD: (순수)가상함수는 주석과 함께 명시적으로 정의한다. 양식은 다음과 같다.
 //				/*virtual*/void Bar::Baz() {...}
 //				/*pure virtual*/void Bar::Baz() {}
@@ -145,93 +200,83 @@ void MessageHandler::run()
         std::cout<<"    ("<<i<<"): "<<command.parameters[i]<<std::endl;
     std::cout<<"[suffix]: "<<command.suffix<<std::endl<<std::endl;
 }
+    User *user = _pDB->searchUser(_FD); // 유저가 존재하는지, 유저 정보변경등에 사용
+    bool disconnect = 0; // while문 break되야 하는지 판단하는 플래그
 
+        if (command.command == "CAP")
+        {
+            CAP(command, user);
+        }
+        else if (user != NULL) // CAP이 된 상태 
+        {
+            if (command.command == "PRIVMSG")
+            {
+                
+            }
+            else if (command.command == "PING")
+            {
+                PING(command, user);
+            }
+            else if (command.command == "NOTICE")
+            {
 
+            }
+            else if (command.command == "JOIN")
+            {
+                JOIN(command, user);
+            }
+            else if (command.command == "PART")
+            {
 
-        // execute command
-        if (command.command == "PRIVMSG")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            PRIVMSG(_FD, command, _pDB);
-        }
-        else if (command.command == "PING")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            PING(_FD, command, _pDB);
-        }
-        else if (command.command == "NOTICE")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            NOTICE(_FD, command, _pDB);
-        }
-        else if (command.command == "JOIN")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            JOIN(_FD, command, _pDB);
-        }
-        else if (command.command == "PART")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            PART(_FD, command, _pDB);
-        }
-        else if (command.command == "TOPIC")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            TOPIC(_FD, command, _pDB);
-        }
-        else if (command.command == "OPER")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            OPER(_FD, command, _pDB);
-        }
-        else if (command.command == "MODE")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            MODE(_FD, command, _pDB);
-        }
-        else if (command.command == "INVITE")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            INVITE(_FD, command, _pDB);
-        }
-        else if (command.command == "KICK")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            KICK(_FD, command, _pDB);
-        }
-        else if (command.command == "PASS")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            PASS(_FD, command, _pDB);
-        }
-        else if (command.command == "NICK")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            NICK(_FD, command, _pDB);
-        }
-        else if (command.command == "USER")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            USER(_FD, command, _pDB);
-        }
-        else if (command.command == "CAP")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            CAP(_FD, command, _pDB);
-        }
-        else if (command.command == "QUIT")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            QUIT(_FD, command, _pDB);
-        }
-        else if (command.command == "KILL")
-        {
-std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
-            KILL(_FD, command, _pDB);
-        }
-        else
-        {
-std::cout<<">>NO COMMAND"<<std::endl;
+            }
+            else if (command.command == "TOPIC")
+            {
+
+            }
+            else if (command.command == "OPER")
+            {
+
+            }
+            else if (command.command == "MODE")
+            {
+                MODE(command, user);
+            }
+            else if (command.command == "INVITE")
+            {
+
+            }
+            else if (command.command == "KICK")
+            {
+
+            }
+            else if (command.command == "PASS")
+            {
+                PASS(command, user);
+            }
+            else if (command.command == "NICK")
+            {
+                NICK(command, user);
+            }
+            else if (command.command == "USER")
+            {
+                USER(command, user);
+            }
+            else if (command.command == "QUIT")
+            {
+
+            }
+            else if (command.command == "KILL")
+            {
+
+            }
+            else
+            {
+
+            }
+            if (disconnect == 1)
+            {
+                // 연결 종료 
+            }
         }
     }
 }
@@ -255,95 +300,201 @@ std::vector<std::string> MessageHandler::split(const std::string& STR, char DL)
     return (RET);
 }
 
-    /* request command */
-void MessageHandler::PRIVMSG(int FD, s_Command CMD, Database * const pDB)
+
+void MessageHandler::CAP(s_Command CMD, User *user)
 {
-(void)FD; (void)CMD; (void)pDB;
+            // _FD에 해당하는 유저가 없는지 확인
+            (void)CMD;
+            if (user == NULL)
+            {
+                std::string tmp = "default";
+                // _FD를 제외하고 기본값만을 가진 user를 만든다.
+                _pDB->addUserAtPairVec(_FD,tmp, tmp, tmp, tmp, tmp, 0,0,0,0,0,0);
+            }
 }
 
-void MessageHandler::PING(int FD, s_Command CMD, Database * const pDB)
+void MessageHandler::NICK(s_Command CMD, User *user)
 {
-(void)FD; (void)CMD; (void)pDB;
+    if (!(user->getBoolAuthority()))
+        return;
+
+    std::string msg;
+    if (CMD.parameters.size() < 1)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);                //send message , ERR_NEEDMOREPARAMS (461)
+    }
+    else 
+    {
+        std::string tmpNickname = CMD.parameters[0];
+        std::string originNickname = user->getNickname();
+        if (tmpNickname.length() == 0) // ERR_NONICKNAMEGIVEN
+        {
+            msg = COL + Server::Host + SPACE + ERR_NONICKNAMEGIVEN + ERR_NONICKNAMEGIVEN_MSG + ENDL;
+            send(_FD, msg.c_str(), msg.size(), 0);
+        }
+        else if (tmpNickname.compare("default") == 0 || tmpNickname.length() > 9) // 닉네임 길이 제한   
+        {
+            msg = COL + Server::Host + SPACE + ERR_ERRONEUSNICKNAME + SPACE + tmpNickname + ERR_ERRONEUSNICKNAME_MSG + ENDL;
+            send(_FD, msg.c_str(), msg.size(), 0);
+
+            std::cout << "nickbad " << std::endl;
+        }
+        else if (_pDB->searchUser(tmpNickname) != 0) // 중복 닉이 있다면
+        {
+            msg = COL + Server::Host + SPACE + ERR_NICKNAMEINUSE + SPACE + AST + SPACE + tmpNickname + ERR_NICKNAMEINUSE_MSG + ENDL;
+            send(_FD, msg.c_str(), msg.size(), 0);
+        }
+        else // 정상 작동 
+        {
+            msg = COL + originNickname + SPACE + CMD.command + SPACE + COL + tmpNickname + ENDL;
+            user->setNickname(tmpNickname);
+            send(_FD, msg.c_str(), msg.size(), 0);
+
+
+            std::cout << "nickgood" << std::endl;
+        }
+    }
 }
 
-void MessageHandler::NOTICE(int FD, s_Command CMD, Database * const pDB)
+void MessageHandler::USER(s_Command CMD, User *user)
 {
-(void)FD; (void)CMD; (void)pDB;
+    if (!(user->getBoolAuthority()))
+        return ;
+    
+    std::string msg;
+    if (CMD.parameters.size() != 3)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);                //send message , ERR_NEEDMOREPARAMS (461)
+    }
+    else
+    {
+        std::string tmpUsername = CMD.parameters[0];
+        if (user->getUsername().compare("default") != 0) // 이미 auth 된 유저이면서 초기설정을 이미 한 경우
+        {
+            msg = COL + Server::Host + SPACE + ERR_ALREADYREGISTERED + SPACE + user->getNickname() + SPACE + CMD.command + ERR_ALREADYREGISTERED_MSG + ENDL;
+            send(_FD, msg.c_str(), msg.size(), 0);
+        }
+        else if (tmpUsername.length() == 0)
+        {
+            msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+            send(_FD, msg.c_str(), msg.size(), 0); 
+        } 
+        else
+        {
+            user->setUsername(tmpUsername);
+            if (CMD.suffix.length())
+                user->setRealname(CMD.suffix);
+            std::string welcome = " :Welcome to ft_irc! ";
+            msg = COL + Server::Host + SPACE + RPL_WELCOME + SPACE + user->getNickname() + welcome + tmpUsername + ENDL;
+            send(_FD, msg.c_str(), msg.size(), 0); 
+            std::cout << welcome << std::endl;
+        }
+    }
 }
 
-void MessageHandler::JOIN(int FD, s_Command CMD, Database * const pDB)
+void MessageHandler::PASS(s_Command CMD, User *user)
 {
-(void)FD; (void)CMD; (void)pDB;
+    std::string msg;
+    
+    if (CMD.parameters.size() < 1) // 인자 부족
+    {
+        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+        int fd = _FD;
+        _pDB->clearUserAtDatabase(fd);
+    }
+    else if (Server::ServPWD.compare(CMD.parameters[0]) != 0) // 비밀번호 다를때 
+    {
+        msg = COL + Server::Host + SPACE + ERR_PASSWDMISMATCH + SPACE + CMD.command + ERR_PASSWDMISMATCH_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+        int fd = _FD;
+        _pDB->clearUserAtDatabase(fd);
+    }
+    else // 비밀번호 맞을떄
+    {
+        bool auth = 1;
+        std::cout<< "good" << std::endl;
+        user->setBoolAuthority(auth);
+    } 
 }
 
-void MessageHandler::NAMES(int FD, s_Command CMD, Database * const pDB)
+void MessageHandler::MODE(s_Command CMD, User *user)
 {
-(void)FD; (void)CMD; (void)pDB;
+    if (!(user->getBoolAuthority()))
+        return; 
+
+    std::string msg;
+
+    if (CMD.parameters.size() < 1)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+    }
+    else
+    {
+        std::string target = CMD.parameters[0];
+        if (target[0] == '#') //channel
+        {
+            // 채널 있는지 -> 채널 어드민인지 순서대로 확인 필 
+        }
+        else if (target[0] != '#') //user 
+        {
+            if (_pDB->searchUser(target) == 0)
+            {
+                msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + target + ERR_NOSUCHNICK_MSG + ENDL;
+                send(_FD, msg.c_str(), msg.size(), 0);
+            }
+            // Usermode 는 ft_irc에서 요구 X이지만 혹시 request 됐을경우 default인 RPL_UMODEIS (221)의 +i 를 넣어줌 
+            else 
+            {
+                std::string RPL_UMODEIS = "221";
+                std::string inv_mode = "+i";
+                msg = COL + Server::Host + SPACE + RPL_UMODEIS + SPACE + target + SPACE + COL + inv_mode + ENDL;
+                send(_FD, msg.c_str(), msg.size(), 0);
+                
+                std::cout << "MODE USER OK " << std::endl;
+            }
+        }
+    }
 }
 
-void MessageHandler::PART(int FD, s_Command CMD, Database * const pDB)
+void MessageHandler::JOIN(s_Command CMD, User *user)
 {
-(void)FD; (void)CMD; (void)pDB;
+    std::string msg;
+    if (user->getBoolAuthority() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+        return ;
+    }
 }
 
-void MessageHandler::TOPIC(int FD, s_Command CMD, Database * const pDB)
+void MessageHandler::PING(s_Command CMD, User *user)
 {
-(void)FD; (void)CMD; (void)pDB;
+    if (!(user->getBoolAuthority()))
+        return; 
+
+    std::string msg;
+    if (CMD.parameters.size() < 1)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);                    
+    }
+    else if (CMD.parameters[0].length() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOORIGIN + SPACE + user->getUsername() + ERR_NOORIGIN_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);   
+    }
+    else
+    {
+        std::string PONG = "PONG";
+        msg = COL + Server::Host + SPACE + PONG + SPACE + Server::Host + CMD.parameters[0] + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);   
+
+        std::cout << "PONG SENTED!!" << std::endl;                   
+    }
 }
-
-void MessageHandler::OPER(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-void MessageHandler::INVITE(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-void MessageHandler::KICK(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-void MessageHandler::PASS(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-void MessageHandler::NICK(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-void MessageHandler::USER(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-void MessageHandler::MODE(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-void MessageHandler::CAP(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-void MessageHandler::QUIT(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-void MessageHandler::KILL(int FD, s_Command CMD, Database * const pDB)
-{
-(void)FD; (void)CMD; (void)pDB;
-}
-
-
-    /* response command */
-
-
 //****************************************************************************/
 //GLOBAL FUNCTION ************************************************************/

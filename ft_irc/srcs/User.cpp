@@ -14,17 +14,22 @@
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
     //PUBLIC:
-User::User(int FD, std::string &realname, std::string &nickname, std::string &PWD, \
-        std::string &host, s_UserMode &mode, bool& bAUTH, bool& bPWD)
+User::User(int FD, std::string realname, std::string nickname, std::string username, std::string PWD, \
+        std::string host, bool bI, bool bS, bool bW, bool bO, bool bAUTH, bool bPWD)
     : _FD(FD)
     , _realname(realname)
     , _nickname(nickname)
+    , _username(username)
     , _PWD(PWD)
     , _host(host)
-    , _mode(mode)
     , _bAUTH(bAUTH)
     , _bPWD(bPWD)
-{   }
+{   
+    _mode.bI = bI;
+    _mode.bS = bS;
+    _mode.bW = bW;
+    _mode.bO = bO;
+}
 
 User::~User()
 {	}
@@ -106,6 +111,16 @@ const std::string User::getNickname() const
 void User::setNickname(std::string& nickname)
 {
     _nickname = nickname;
+}
+
+const std::string User::getUsername() const
+{
+    return (_username);
+}
+
+void User::setUsername(std::string& username)
+{
+    _username = username;
 }
 
 const std::string User::getPassword() const

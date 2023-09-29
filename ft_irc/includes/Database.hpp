@@ -3,7 +3,6 @@
 # define DATABASE_HPP
 
 # include <unistd.h>
-
 # include <iostream>
 # include <vector>
 # include "Channel.hpp"
@@ -24,14 +23,6 @@ typedef struct ChannelUserNode
 
 typedef std::vector<s_ChannelUserNode>      ChannelUserTable;
 
-// eIsUserAtChannel isUserAtChannel(std::string&, std::string&);
-enum eIsUserAtChannel
-{
-    NO_USER,
-    IS_USER_NOT_OP,
-    IS_USER_OP
-};
-
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
 //				멤버변수를 public으로 선언할 수 있다.
 //			반드시! 상속 여부를 체크한 뒤 클래스를 작성한다. (std::exception 상속은 제외)
@@ -44,6 +35,13 @@ enum eIsUserAtChannel
 // is do inherit? (NO): is abstracted? (NO): is interface? (NO)
 // is be inherited? (NO)
 
+enum eIsUserAtChannel
+{
+    NO_USER,
+    IS_USER_NOT_OP,
+    IS_USER_OP
+};
+
 class Database
 {
 public:
@@ -55,14 +53,18 @@ public:
     //Getter & Setter
     //Behavior
     void clearDatabase(); // DB clear before exit server
-    void addUserAtPairVec(int& FD, \
-                            std::string& realname, \
-                            std::string& nickname, \
-                            std::string& PWD, \
-                            std::string& host, \
-                            s_UserMode& mode, \
-                            bool& bAUTH, \
-                            bool& bPWD); // when user accepted at server, but not a channel
+    void addUserAtPairVec(int FD, \
+                            std::string realname, \
+                            std::string nickname, \
+                            std::string username, \
+                            std::string PWD, \
+                            std::string host, \
+                            bool bI, \
+                            bool bS, \
+                            bool bW, \
+                            bool bO, \
+                            bool bAUTH, \
+                            bool bPWD); // when user accepted at server, but not a channel
     void clearUserAtDatabase(int& FD); // when user quit at server
     void createChannelAtDatabase(User* pMaker, \
                                     std::string& name, \
@@ -71,8 +73,10 @@ public:
     void clearChannelAtDatabase(std::string& name); // when last user leave a channel
     void joinChannel(int& FD, std::string& chanName); // when some user join channel already exist
     void leaveChannel(int& FD, std::string& chanName); // when some user leave channel already exist
+
     eIsUserAtChannel isUserAtChannel(std::string& chanName, std::string& userNick);
     User* searchUser(std::string& nickname);
+    User* searchUser(const int &fd);
     Channel* searchChannel(std::string& chanName);
 
 private:

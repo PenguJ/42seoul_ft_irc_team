@@ -19,8 +19,8 @@
 typedef struct UserMode
 {
     bool    bI; // marks a users as invisible
-    bool    bW; // user receives wallops
     bool    bS; // marks a user for receipt of server notices
+    bool    bW; // user receives wallops
     bool    bO; /* operator flag
                 If a user attempts to make themselves an operator using the "+o" flag, the attempt should be ignored.  There is no restriction, however, on anyone `deopping' themselves (using "-o") */
 }   s_UserMode;
@@ -29,9 +29,10 @@ class User
 {
 public:
     //Constructor overload & OCCF
-    User(int FD, std::string &realname, std::string &nickname, \
-        std::string &PWD, std::string &host, s_UserMode &mode, \
-        bool& bAUTH, bool& bPWD);
+    User(int FD, std::string realname, std::string nickname, std::string username, \
+        std::string PWD, std::string host, \
+        bool bI, bool bS, bool bW, bool bO, \
+        bool bAUTH, bool bPWD);
     ~User();
     //Exception
     //Operator overload
@@ -42,6 +43,8 @@ public:
     void setRealname(std::string& realname);
     const std::string getNickname() const;
     void setNickname(std::string& nickname);
+    const std::string getUsername() const;
+    void setUsername(std::string& PWD);
     const std::string getPassword() const;
     void setPassword(std::string& PWD);
     const std::string getHost() const;
@@ -68,11 +71,12 @@ private:
     int         _FD;
     std::string _realname;
     std::string _nickname;
-    std::string _PWD; // may be will be deleted..?
+    std::string _username;
+    std::string _PWD;
     std::string _host;
     s_UserMode  _mode;
     bool        _bAUTH;
-    bool        _bPWD; // if authority manage all, then it will be deleted also.
+    bool        _bPWD;
 };
 
 //GLOBAL FUNCTION for class User{}
