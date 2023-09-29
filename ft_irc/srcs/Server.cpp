@@ -144,9 +144,9 @@ void Server::execute()
         std::vector<pollfd>::iterator iter = _PFDS.begin();
 
         eventFD = poll(_PFDS.begin().base(), _PFDS.size(), -1);
-        if (eventFD <= 0)
+        if (eventFD < 0)
         {
-            throw std::runtime_error("error: poll()");
+            break ;
         }
 
         for (iter = _PFDS.begin(); iter != _PFDS.end(); ++iter)

@@ -18,16 +18,17 @@
 
 typedef struct ChannelMode
 {
+    bool        bO; // give/take channel operator privileges        -> ON SUBJECT
     bool        bP; // private channel flag
     bool        bS; // secret channel flag
-    bool        bI; // invite-only channel flag
-    bool        bT; // topic settable by channel operator only flag
+    bool        bI; // invite-only channel flag                     -> ON SUBJECT
+    bool        bT; // topic settable by channel operator only flag -> ON SUBJECT
     bool        bN; // no messages to channel from clients on the outside
     bool        bM; // moderated channel
-    bool        bL; // set the user limit to channel
+    bool        bL; // set the user limit to channel                -> ON SUBJECT
     bool        bB; // set a ban mask to keep users out
     bool        bV; // give/take the ability to speak on a moderated channel
-    bool        bK; // set a channel key (password)
+    bool        bK; // set a channel key (password)                 -> ON SUBJECT
     int         userLimit; // by mode 'l'
     std::string channelkey; // by mode 'k'
 }   s_ChannelMode;

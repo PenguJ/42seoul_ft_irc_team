@@ -124,7 +124,7 @@ void MessageHandler::run()
             }
 
             command.prefix = presentCMD.substr(1, endOfPrefix);
-            presentCMD.erase(0, endOfPrefix);
+            presentCMD.erase(0, endOfPrefix + 1);
         }
         TMP = split(presentCMD, ':');
         if (TMP.size() != 1)
@@ -151,67 +151,83 @@ void MessageHandler::run()
         // execute command
         if (command.command == "PRIVMSG")
         {
-std::cout<<">>PRIVMSG"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            PRIVMSG(_FD, command, _pDB);
         }
         else if (command.command == "PING")
         {
-std::cout<<">>PING"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            PING(_FD, command, _pDB);
         }
         else if (command.command == "NOTICE")
         {
-std::cout<<">>NOTICE"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            NOTICE(_FD, command, _pDB);
         }
         else if (command.command == "JOIN")
         {
-std::cout<<">>JOIN"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            JOIN(_FD, command, _pDB);
         }
         else if (command.command == "PART")
         {
-std::cout<<">>PART"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            PART(_FD, command, _pDB);
         }
         else if (command.command == "TOPIC")
         {
-std::cout<<">>TOPIC"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            TOPIC(_FD, command, _pDB);
         }
         else if (command.command == "OPER")
         {
-std::cout<<">>OPER"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            OPER(_FD, command, _pDB);
         }
         else if (command.command == "MODE")
         {
-std::cout<<">>MODE"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            MODE(_FD, command, _pDB);
         }
         else if (command.command == "INVITE")
         {
-std::cout<<">>INVITE"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            INVITE(_FD, command, _pDB);
         }
         else if (command.command == "KICK")
         {
-std::cout<<">>KICK"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            KICK(_FD, command, _pDB);
         }
         else if (command.command == "PASS")
         {
-std::cout<<">>PASS"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            PASS(_FD, command, _pDB);
         }
         else if (command.command == "NICK")
         {
-std::cout<<">>NICK"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            NICK(_FD, command, _pDB);
         }
         else if (command.command == "USER")
         {
-std::cout<<">>USER"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            USER(_FD, command, _pDB);
         }
         else if (command.command == "CAP")
         {
-std::cout<<">>CAP"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            CAP(_FD, command, _pDB);
         }
         else if (command.command == "QUIT")
         {
-std::cout<<">>QUIT"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            QUIT(_FD, command, _pDB);
         }
         else if (command.command == "KILL")
         {
-std::cout<<">>KILL"<<std::endl<<std::endl<<std::endl;
+std::cout<<">>"<<command.command<<std::endl<<std::endl<<std::endl;
+            KILL(_FD, command, _pDB);
         }
         else
         {
@@ -238,6 +254,95 @@ std::vector<std::string> MessageHandler::split(const std::string& STR, char DL)
  
     return (RET);
 }
+
+    /* request command */
+void MessageHandler::PRIVMSG(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::PING(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::NOTICE(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::JOIN(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::NAMES(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::PART(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::TOPIC(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::OPER(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::INVITE(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::KICK(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::PASS(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::NICK(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::USER(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::MODE(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::CAP(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::QUIT(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+void MessageHandler::KILL(int FD, s_Command CMD, Database * const pDB)
+{
+(void)FD; (void)CMD; (void)pDB;
+}
+
+
+    /* response command */
 
 
 //****************************************************************************/

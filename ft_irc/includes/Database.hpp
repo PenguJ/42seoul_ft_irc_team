@@ -22,6 +22,14 @@ typedef struct ChannelUserNode
 
 typedef std::vector<s_ChannelUserNode>      ChannelUserTable;
 
+// eIsUserAtChannel isUserAtChannel(std::string&, std::string&);
+enum eIsUserAtChannel
+{
+    NO_USER,
+    IS_USER_NOT_OP,
+    IS_USER_OP
+};
+
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
 //				멤버변수를 public으로 선언할 수 있다.
 //			반드시! 상속 여부를 체크한 뒤 클래스를 작성한다. (std::exception 상속은 제외)
@@ -61,8 +69,7 @@ public:
     void clearChannelAtDatabase(std::string& name); // when last user leave a channel
     void joinChannel(int& FD, std::string& chanName); // when some user join channel already exist
     void leaveChannel(int& FD, std::string& chanName); // when some user leave channel already exist
-
-    bool isOP(std::string& chanName, std::string& userNick);
+    eIsUserAtChannel isUserAtChannel(std::string& chanName, std::string& userNick);
     User* searchUser(std::string& nickname);
     Channel* searchChannel(std::string& chanName);
 

@@ -291,7 +291,8 @@ void Database::leaveChannel(int& FD, std::string& chanName)
     }
 }
 
-bool Database::isOP(std::string& chanName, std::string& userNick)
+eIsUserAtChannel Database::isUserAtChannel(std::string& chanName, \
+                                            std::string& userNick)
 {
     std::vector<s_ChannelUserNode>::iterator iter = _channelUserTable.begin();
 
@@ -300,10 +301,17 @@ bool Database::isOP(std::string& chanName, std::string& userNick)
         if (iter->_pChannelPair->first == chanName && \
             iter->_pUserPair->second->getNickname() == userNick)
         {
-            return (iter->_bOP);
+            if (iter->_bOP)
+            {
+                return (IS_USER_OP);
+            }
+            else
+            {
+                return (IS_USER_NOT_OP);
+            }
         }
     }
-    return (false);
+    return (NO_USER);
 }
 
 User* Database::searchUser(std::string& nickname)

@@ -31,7 +31,7 @@ int main()
     int sock = -1;
     SOCKADDR_IN addr;
     char buf[MAX_LEN_OF_BUF] = {0, };
-    const char* msg = "CAP LS\r\nPASS 1234\r\nUSER jeojeon jeojeon 127.0.0.1 :jeojeon\r\n";
+    const char* msg = "CAP LS\r\nPASS 1234\r\n:localhost.com USER jeojeon jeojeon 127.0.0.1 :jeojeon\r\n";
     ssize_t recv_len;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)

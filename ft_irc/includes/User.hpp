@@ -19,8 +19,8 @@
 typedef struct UserMode
 {
     bool    bI; // marks a users as invisible
-    bool    bS; // marks a user for receipt of server notices
     bool    bW; // user receives wallops
+    bool    bS; // marks a user for receipt of server notices
     bool    bO; /* operator flag
                 If a user attempts to make themselves an operator using the "+o" flag, the attempt should be ignored.  There is no restriction, however, on anyone `deopping' themselves (using "-o") */
 }   s_UserMode;
@@ -68,11 +68,11 @@ private:
     int         _FD;
     std::string _realname;
     std::string _nickname;
-    std::string _PWD;
+    std::string _PWD; // may be will be deleted..?
     std::string _host;
     s_UserMode  _mode;
     bool        _bAUTH;
-    bool        _bPWD;
+    bool        _bPWD; // if authority manage all, then it will be deleted also.
 };
 
 //GLOBAL FUNCTION for class User{}
