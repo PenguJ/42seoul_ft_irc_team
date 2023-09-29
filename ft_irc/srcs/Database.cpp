@@ -96,13 +96,13 @@ void Database::clearDatabase()
 {
     for (size_t i = 0; i < _users.size(); ++i)
     {
+        close(_users[i].first);
         _users[i].first = -1;
         delete _users[i].second;
         _users[i].second = NULL;
     }
     for (size_t i = 0; i < _channels.size(); ++i)
     {
-        close(_users[i].first);
         _channels[i].first.clear();
         delete _channels[i].second;
         _channels[i].second = NULL;
