@@ -61,10 +61,10 @@ private:
     void PING(s_Command CMD, User *user);
     // void NOTICE(s_Command CMD, User *user); //안쓸듯
     void JOIN(s_Command CMD, User *user);
-    void NAMES(s_Command CMD, User *user);
+    // void NAMES(s_Command CMD, User *user); //안쓸듯
     void PART(s_Command CMD, User *user);
     void TOPIC(s_Command CMD, User *user);
-    void OPER(s_Command CMD, User *user);
+    // void OPER(s_Command CMD, User *user); //안쓸듯
     void MODE(s_Command CMD, User *user);
     void INVITE(s_Command CMD, User *user);
     void KICK(s_Command CMD, User *user);

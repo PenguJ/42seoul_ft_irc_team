@@ -43,9 +43,9 @@ public:
     //Operator overload
     //Getter & Setter
     const std::string getName() const;
-    void setName(std::string& name);
+    void setName(std::string name);
     const std::string getTopic() const;
-    void setTopic(std::string& topic);
+    void setTopic(std::string topic);
     s_ChannelMode getChannelMode() const;
     void setChannelMode(s_ChannelMode& mode);
     //Behavior

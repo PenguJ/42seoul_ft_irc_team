@@ -305,6 +305,8 @@ eIsUserAtChannel Database::isUserAtChannel(std::string& chanName, \
 
     for (; iter != _channelUserTable.end(); ++iter)
     {
+        std::cout << "CHANNAME" << chanName << std::endl;
+        std::cout << "usernick" << userNick << std::endl;
         if (iter->_pChannelPair->first == chanName && \
             iter->_pUserPair->second->getNickname() == userNick)
         {

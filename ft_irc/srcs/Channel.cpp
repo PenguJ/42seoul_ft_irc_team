@@ -82,7 +82,7 @@ const std::string Channel::getName() const
     return (_name);
 }
 
-void Channel::setName(std::string& name)
+void Channel::setName(std::string name)
 {
     _name = name;
 }
@@ -92,7 +92,7 @@ const std::string Channel::getTopic() const
     return (_topic);
 }
 
-void Channel::setTopic(std::string& topic)
+void Channel::setTopic(std::string topic)
 {
     _topic = topic;
 }

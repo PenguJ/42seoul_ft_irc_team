@@ -241,10 +241,6 @@ void MessageHandler::run()
             {
                 TOPIC(command, user);
             }
-            else if (command.command == "OPER")
-            {
-
-            }
             else if (command.command == "MODE")
             {
                 MODE(command, user);
@@ -372,6 +368,7 @@ void MessageHandler::NICK(s_Command CMD, User *user)
 
 void MessageHandler::USER(s_Command CMD, User *user)
 {
+    std::string msg;
     if (user->getBoolAuthority() == 0)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
@@ -379,7 +376,6 @@ void MessageHandler::USER(s_Command CMD, User *user)
         return ;
     }
     
-    std::string msg;
     if (CMD.parameters.size() != 3)
     {
         msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
@@ -562,7 +558,7 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                                     msg = COL + Server::Host + SPACE + ERR_INVITEONLYCHAN + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_INVITEONLYCHAN_MSG + ENDL;
                                     send(_FD, msg.c_str(), msg.size(), 0); 
                                 }
-                                else if (CHANNEL->getChannelMode().userLimit != -1 && _pDB->getUsersAtChannel(channel_name).size() >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을때
+                                else if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을때
                                 {   
                                     msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
                                     send(_FD, msg.c_str(), msg.size(), 0);                                     
@@ -584,7 +580,7 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                         }
                         else
                         {
-                            if (CHANNEL->getChannelMode().userLimit != -1 && _pDB->getUsersAtChannel(channel_name).size() >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을 때
+                            if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을 때
                             {   
                                 msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
                                 send(_FD, msg.c_str(), msg.size(), 0);                                     
@@ -608,33 +604,94 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
 void MessageHandler::TOPIC(s_Command CMD, User *user)
 {
     std::string msg;
-
-    if (CMD.parameters.size() < 1)
-    {
-        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
-        send(_FD, msg.c_str(), msg.size(), 0);                    
-    }
-
-    std::string username = user->getNickname();
-    std::string channelname = CMD.parameters[0];
-    int auth = _pDB->isUserAtChannel(channelname, username);
-
     if (user->getBoolAuthority() == 0)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);
         return ;
     }
-    
 
-    
-    if (CMD.parameters.size() == 1) // channel의 topic 조회
+    if (CMD.parameters.size() < 1)
     {
-        if (auth == 0)
+        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+        return ;              
+    }
+
+    std::string nickname = user->getNickname();
+    std::string channelname = CMD.parameters[0]; //클라이언트에서 자동으로 해쉬 붙혀줌
+    if (channelname[0] == '#') // '#' 제거 
+    {
+        channelname = channelname.substr(1);
+    }  
+    int auth = _pDB->isUserAtChannel(channelname, nickname);
+    Channel* channel = _pDB->searchChannel(channelname);
+
+
+    //DEBUG
+    std::cout << "param cnt" << CMD.parameters.size() << std::endl;
+    if (channel != NULL)
+        std::cout << "channel topic" <<  channel->getTopic() << std::endl;
+    std::cout << CMD.suffix.empty() << std::endl;
+
+    if (channel == NULL) //채널이 없을경우
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOSUCHCHANNEL + SPACE + channelname + ERR_NOSUCHCHANNEL_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0); 
+    }
+    else if (auth == 0) // 자신이 속한 채널이 아닌데 조회하려고 할 경우
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + channelname + ERR_NOTONCHANNEL_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0); 
+        std::cout << "no auth?" << std::endl;
+    }
+    else if (CMD.parameters.size() == 1  && CMD.suffix.empty()) // channel의 topic 조회
+    {
+        if (channel->getChannelMode().bT && auth == 1) // 채널 mode +t이면서 권한 없을 시 
         {
-            msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + CMD.command + ERR_NOTONCHANNEL_MSG + ENDL;
+            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);  
-        }        
+        }
+        else 
+        {
+            if (channel->getTopic() == "") // 토픽이 없을경우
+            {   
+                std::string RPL_TOPIC_MSG = " :No topic is set";
+                msg = COL + Server::Host + SPACE + RPL_NOTOPIC + SPACE + nickname + SPACE + channelname + RPL_TOPIC_MSG + ENDL;
+                send(_FD, msg.c_str(), msg.size(), 0);  
+            }
+            else // 토픽이 있을경우
+            {
+                msg = COL + Server::Host + SPACE + RPL_TOPIC + SPACE + nickname + SPACE + channelname + SPACE + COL + channel->getTopic() + ENDL; 
+                send(_FD, msg.c_str(), msg.size(), 0);  
+            }
+        }
+    }
+    else if (CMD.parameters.size() == 1 && !(CMD.suffix.empty())) // channel의 topic 변경
+    {
+        std::cout << "HERE" << std::endl;
+        if (channel->getChannelMode().bT && auth == 1) // 채널 mode +t이면서 권한 없을 시 
+        {
+            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
+            send(_FD, msg.c_str(), msg.size(), 0);  
+        }
+        else
+        {
+            std::vector<std::string>suf_split = split(CMD.suffix,' ');
+            if (suf_split.size() > 1) // 클라이언트에서 서버이름에 #을 붙히면 suffix 그대로 오고, 안붙히면 suffix는 서버이름+topic으로 오기때문에 구분 
+            {
+                channel->setTopic(suf_split[1]);
+                std::cout << suf_split[1] << "is topic!" << std::endl;
+            }
+            else
+            {
+                channel->setTopic(suf_split[0]);
+                std::cout << suf_split[0] << "is topic!" << std::endl;
+            }
+            msg = COL + Server::Host + SPACE + RPL_TOPIC + SPACE + nickname + SPACE + channelname + SPACE + COL + channel->getTopic() + ENDL;  // tcpflow상으로 설정하고 끝이긴함.
+            std::cout << msg << std::endl;
+            send(_FD, msg.c_str(), msg.size(), 0);
+        }
     }
 }
 
