@@ -14,13 +14,13 @@
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
     //PUBLIC:
-User::User(int FD, std::string realname, std::string nickname, std::string username, std::string PWD, \
+User::User(int FD, std::string realname, std::string nickname, std::string username, std::string currentchannel, \
         std::string host, bool bI, bool bS, bool bW, bool bO, bool bAUTH, bool bPWD)
     : _FD(FD)
     , _realname(realname)
     , _nickname(nickname)
     , _username(username)
-    , _PWD(PWD)
+    , _currentchannel(currentchannel)
     , _host(host)
     , _bAUTH(bAUTH)
     , _bPWD(bPWD)
@@ -123,14 +123,14 @@ void User::setUsername(std::string& username)
     _username = username;
 }
 
-const std::string User::getPassword() const
+const std::string User::getCurrentChannel() const
 {
-    return (_PWD);
+    return (_currentchannel);
 }
 
-void User::setPassword(std::string& PWD)
+void User::setCurrentChannel(std::string& channel)
 {
-    _PWD = PWD;
+    _currentchannel = channel;
 }
 
 const std::string User::getHost() const

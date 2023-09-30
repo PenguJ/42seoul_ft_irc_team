@@ -354,7 +354,18 @@ Channel* Database::searchChannel(std::string& chanName)
     return (NULL);
 }
 
-
+std::vector<std::string> Database::getUsersAtChannel(std::string &chanName)
+{
+    std::vector<std::string> users;
+    for (size_t i = 0; i < _channelUserTable.size(); ++i)
+    {
+        if (_channelUserTable[i]._pChannelPair->first == chanName)
+        {
+            users.push_back(_channelUserTable[i]._pUserPair->second->getNickname());
+        }
+    }
+    return users;
+}
 
     //PRIVATE:
 

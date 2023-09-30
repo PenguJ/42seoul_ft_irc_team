@@ -7,7 +7,11 @@ const std::string MessageHandler::ENDL = "\r\n";
 const std::string MessageHandler::COL = ":";
 const std::string MessageHandler::SPACE = " ";
 const std::string MessageHandler::AST = "*";
+const std::string MessageHandler::HASH = "#";
 const std::string MessageHandler::RPL_WELCOME = "001";
+const std::string MessageHandler::RPL_UMODEIS = "221";
+const std::string MessageHandler::RPL_NOTOPIC = "331";
+const std::string MessageHandler::RPL_TOPIC = "332";
 const std::string MessageHandler::ERR_UNKNOWNERROR = "400";
 const std::string MessageHandler::ERR_NOSUCHNICK = "401";
 const std::string MessageHandler::ERR_NOSUCHNICK_MSG = " :No such nick/channel";
@@ -40,7 +44,6 @@ const std::string MessageHandler::ERR_USERNOTINCHANNEL_MSG = " :They aren't on t
 const std::string MessageHandler::ERR_NOTONCHANNEL = "442";
 const std::string MessageHandler::ERR_NOTONCHANNEL_MSG = " :You're not on that channel";
 const std::string MessageHandler::ERR_USERONCHANNEL = "443";
-
 const std::string MessageHandler::ERR_NOTREGISTERED = "451";
 const std::string MessageHandler::ERR_NOTREGISTERED_MSG = ":You have not registered";
 const std::string MessageHandler::ERR_NEEDMOREPARAMS = "461";
@@ -51,6 +54,11 @@ const std::string MessageHandler::ERR_PASSWDMISMATCH = "464";
 const std::string MessageHandler::ERR_PASSWDMISMATCH_MSG = " :Password incorrect";
 
 const std::string MessageHandler::ERR_CHANNELISFULL = "471";
+const std::string MessageHandler::ERR_CHANNELISFULL_MSG = " :Cannot join channel (+l)";
+const std::string MessageHandler::ERR_INVITEONLYCHAN = "473";
+const std::string MessageHandler::ERR_INVITEONLYCHAN_MSG = " :Cannot join channel (+i)";
+const std::string MessageHandler::ERR_BADCHANNELKEY = "475";
+const std::string MessageHandler::ERR_BADCHANNELKEY_MSG = " :Cannot join channel (+k)"; 
 const std::string MessageHandler::ERR_ERRONEUSCHANNELNAME = "479";
 const std::string MessageHandler::ERR_ERRONEUSCHANNELNAME_MSG = " :Channel name contains illegal characters";
 const std::string MessageHandler::ERR_CHANOPRIVSNEEDED = "482";
@@ -217,10 +225,10 @@ void MessageHandler::run()
             {
                 PING(command, user);
             }
-            else if (command.command == "NOTICE")
-            {
-
-            }
+            // else if (command.command == "NOTICE")
+            // {
+            //     NOTICE(command, user);
+            // }
             else if (command.command == "JOIN")
             {
                 JOIN(command, user);
@@ -231,7 +239,7 @@ void MessageHandler::run()
             }
             else if (command.command == "TOPIC")
             {
-
+                TOPIC(command, user);
             }
             else if (command.command == "OPER")
             {
@@ -315,10 +323,15 @@ void MessageHandler::CAP(s_Command CMD, User *user)
 
 void MessageHandler::NICK(s_Command CMD, User *user)
 {
-    if (!(user->getBoolAuthority()))
-        return;
-
     std::string msg;
+
+    if (user->getBoolAuthority() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
     if (CMD.parameters.size() < 1)
     {
         msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
@@ -328,7 +341,7 @@ void MessageHandler::NICK(s_Command CMD, User *user)
     {
         std::string tmpNickname = CMD.parameters[0];
         std::string originNickname = user->getNickname();
-        if (tmpNickname.length() == 0) // ERR_NONICKNAMEGIVEN
+        if (tmpNickname.length() == 0) // ERR_NONICKNAMEGIVEN 
         {
             msg = COL + Server::Host + SPACE + ERR_NONICKNAMEGIVEN + ERR_NONICKNAMEGIVEN_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);
@@ -354,13 +367,17 @@ void MessageHandler::NICK(s_Command CMD, User *user)
 
             std::cout << "nickgood" << std::endl;
         }
-    }
+    } 
 }
 
 void MessageHandler::USER(s_Command CMD, User *user)
 {
-    if (!(user->getBoolAuthority()))
+    if (user->getBoolAuthority() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
         return ;
+    }
     
     std::string msg;
     if (CMD.parameters.size() != 3)
@@ -397,7 +414,8 @@ void MessageHandler::USER(s_Command CMD, User *user)
 void MessageHandler::PASS(s_Command CMD, User *user)
 {
     std::string msg;
-    
+    if (user->getBoolAuthority())
+        return ;
     if (CMD.parameters.size() < 1) // 인자 부족
     {
         msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
@@ -449,7 +467,6 @@ void MessageHandler::MODE(s_Command CMD, User *user)
             // Usermode 는 ft_irc에서 요구 X이지만 혹시 request 됐을경우 default인 RPL_UMODEIS (221)의 +i 를 넣어줌 
             else 
             {
-                std::string RPL_UMODEIS = "221";
                 std::string inv_mode = "+i";
                 msg = COL + Server::Host + SPACE + RPL_UMODEIS + SPACE + target + SPACE + COL + inv_mode + ENDL;
                 send(_FD, msg.c_str(), msg.size(), 0);
@@ -469,14 +486,169 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
         send(_FD, msg.c_str(), msg.size(), 0);
         return ;
     }
+    if (CMD.parameters.size() < 1)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);                    
+        return ;
+    }
+    else
+    {
+        std::vector<std::string>channels = split(CMD.parameters[0],',');
+        std::vector<std::string>keylist;
+
+        if (CMD.parameters.size() > 1) // 키 까지 주어졌을경우
+        {
+            std::vector<std::string>keylist = split(CMD.parameters[1],','); // JOIN test1,test2,test3 123 처럼 들어오면 클라이언트에서 123,x,x로 바꿔줘서 들어오기 때문에 두 벡터의 size는 같을것임
+            while (channels.size() > keylist.size()) // 혹시 모를 index out of range 방지 
+                keylist.push_back("x");
+        }
+        for (size_t i = 0; i < channels.size(); ++i)
+        {
+            int FD = _FD;
+            std::string channel_name = channels[i];
+            std::string user_nick = user->getNickname();
+            std::string user_real = user->getRealname();
+            std::string msg; 
+            if (!channel_name.empty())
+            {
+                if (channels[i][0] == '#') // '#' 제거 
+                {
+                    channel_name = channel_name.substr(1);
+                }
+                Channel *CHANNEL = _pDB->searchChannel(channel_name);
+
+                if (CHANNEL == NULL) // 채널이 없는 경우 
+                {   
+                    std::string topic_tmp = ""; // 기본값 "" 라고 명시 되어있음
+
+                    ChannelMode CM;
+                    CM.bO = 0;
+                    CM.bP = 0;
+                    CM.bS = 0;
+                    CM.bI = 0;
+                    CM.bT = 0;
+                    CM.bN = 0;
+                    CM.bM = 0;
+                    CM.bL = 0;
+                    CM.bB = 0;
+                    CM.bK = 0;
+                    CM.userLimit = -1;
+                    CM.channelkey = "";
+                    _pDB->createChannelAtDatabase(user, channel_name, topic_tmp, CM);
+                    user->setCurrentChannel(channel_name);
+                    msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + AST + SPACE + COL + user_real + ENDL;
+                    send(_FD, msg.c_str(), msg.size(), 0);  
+                }
+                else // 
+                {
+                    if (_pDB->isUserAtChannel(channel_name, user_nick) != 0) // 채널 명단에 이미 있는 경우
+                    {
+                        user->setCurrentChannel(channel_name); // tcp 통신없음.. 아마 클라이언트단에서 서버스위칭 해주는거같음 
+                    }
+                    else
+                    {
+                        if (CHANNEL->getChannelMode().channelkey != "") // 비밀번호가 있는 채널일 경우 (op이 /mode #<channel> +k <key> 했을때)
+                        {   
+                            if (CMD.parameters.size() == 1 || (CMD.parameters.size() > 1 && CHANNEL->getChannelMode().channelkey != keylist[i])) // key 인자가 없거나 있는데 틀렸을경우
+                            {
+                                msg = COL + Server::Host + SPACE + ERR_BADCHANNELKEY + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_BADCHANNELKEY + ENDL;
+                                send(_FD, msg.c_str(), msg.size(), 0);                         
+                            }
+                            if ((CMD.parameters.size() > 1 && CHANNEL->getChannelMode().channelkey == keylist[i])) // key를 맞췄을 경우
+                            {
+                                if (CHANNEL->getChannelMode().bI == 1) // 비밀번호 맞는데 invite only 일경우 
+                                {
+                                    msg = COL + Server::Host + SPACE + ERR_INVITEONLYCHAN + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_INVITEONLYCHAN_MSG + ENDL;
+                                    send(_FD, msg.c_str(), msg.size(), 0); 
+                                }
+                                else if (CHANNEL->getChannelMode().userLimit != -1 && _pDB->getUsersAtChannel(channel_name).size() >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을때
+                                {   
+                                    msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
+                                    send(_FD, msg.c_str(), msg.size(), 0);                                     
+                                }
+                                else
+                                {
+                                    _pDB->joinChannel(FD,channel_name);
+                                    user->setCurrentChannel(channel_name);
+                                    msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + AST + SPACE + COL + user_real + ENDL;
+                                    send(_FD, msg.c_str(), msg.size(), 0);  
+                                    // join -> 353 -> 366 은 /names 이기 때문에 구현 x 
+                                }
+                            }
+                        }
+                        else if (CHANNEL->getChannelMode().bI == 1) // invite only라서 못들어갈때
+                        {
+                            msg = COL + Server::Host + SPACE + ERR_INVITEONLYCHAN + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_INVITEONLYCHAN_MSG + ENDL;
+                            send(_FD, msg.c_str(), msg.size(), 0); 
+                        }
+                        else
+                        {
+                            if (CHANNEL->getChannelMode().userLimit != -1 && _pDB->getUsersAtChannel(channel_name).size() >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을 때
+                            {   
+                                msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
+                                send(_FD, msg.c_str(), msg.size(), 0);                                     
+                            }
+                            else
+                            {
+                                _pDB->joinChannel(FD,channel_name);
+                                user->setCurrentChannel(channel_name);
+                                msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + AST + SPACE + COL + user_real + ENDL;
+                                send(_FD, msg.c_str(), msg.size(), 0);  
+                                // join -> 353 -> 366
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void MessageHandler::TOPIC(s_Command CMD, User *user)
+{
+    std::string msg;
+
+    if (CMD.parameters.size() < 1)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);                    
+    }
+
+    std::string username = user->getNickname();
+    std::string channelname = CMD.parameters[0];
+    int auth = _pDB->isUserAtChannel(channelname, username);
+
+    if (user->getBoolAuthority() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+    
+
+    
+    if (CMD.parameters.size() == 1) // channel의 topic 조회
+    {
+        if (auth == 0)
+        {
+            msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + CMD.command + ERR_NOTONCHANNEL_MSG + ENDL;
+            send(_FD, msg.c_str(), msg.size(), 0);  
+        }        
+    }
 }
 
 void MessageHandler::PING(s_Command CMD, User *user)
 {
-    if (!(user->getBoolAuthority()))
-        return; 
-
     std::string msg;
+
+    if (user->getBoolAuthority() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+        return ;
+    }
+
     if (CMD.parameters.size() < 1)
     {
         msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;

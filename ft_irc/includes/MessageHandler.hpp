@@ -59,7 +59,7 @@ private:
     Database * const    _pDB;
     void PRIVMSG(s_Command CMD, User *user);
     void PING(s_Command CMD, User *user);
-    void NOTICE(s_Command CMD, User *user);
+    // void NOTICE(s_Command CMD, User *user); //안쓸듯
     void JOIN(s_Command CMD, User *user);
     void NAMES(s_Command CMD, User *user);
     void PART(s_Command CMD, User *user);
@@ -75,11 +75,21 @@ private:
     void QUIT(s_Command CMD, User *user);
     void KILL(s_Command CMD, User *user);
 public:
+
+// SPECIAL CHAR
     static const std::string ENDL;
     static const std::string COL;
     static const std::string SPACE;
     static const std::string AST;
+    static const std::string HASH;
+
+// RPL 
     static const std::string RPL_WELCOME;
+    static const std::string RPL_UMODEIS;
+    static const std::string RPL_NOTOPIC;
+    static const std::string RPL_TOPIC;
+
+// ERR
     static const std::string ERR_UNKNOWNERROR;
     static const std::string ERR_NOSUCHNICK;
     static const std::string ERR_NOSUCHNICK_MSG;
@@ -123,6 +133,11 @@ public:
     static const std::string ERR_PASSWDMISMATCH_MSG;
 
     static const std::string ERR_CHANNELISFULL;
+    static const std::string ERR_CHANNELISFULL_MSG;
+    static const std::string ERR_INVITEONLYCHAN;
+    static const std::string ERR_INVITEONLYCHAN_MSG;
+    static const std::string ERR_BADCHANNELKEY;
+    static const std::string ERR_BADCHANNELKEY_MSG;
     static const std::string ERR_ERRONEUSCHANNELNAME;
     static const std::string ERR_ERRONEUSCHANNELNAME_MSG;
     static const std::string ERR_CHANOPRIVSNEEDED;

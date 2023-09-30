@@ -78,6 +78,7 @@ public:
     User* searchUser(std::string& nickname);
     User* searchUser(const int &fd);
     Channel* searchChannel(std::string& chanName);
+    std::vector<std::string>getUsersAtChannel(std::string &chanName);
 
 private:
     //Constructor overload & OCCF

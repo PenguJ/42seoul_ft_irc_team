@@ -44,9 +44,9 @@ public:
     const std::string getNickname() const;
     void setNickname(std::string& nickname);
     const std::string getUsername() const;
-    void setUsername(std::string& PWD);
-    const std::string getPassword() const;
-    void setPassword(std::string& PWD);
+    void setUsername(std::string& username);
+    const std::string getCurrentChannel() const;
+    void setCurrentChannel(std::string& channel);
     const std::string getHost() const;
     void setHost(std::string& host);
     s_UserMode getUserMode() const;
@@ -72,7 +72,7 @@ private:
     std::string _realname;
     std::string _nickname;
     std::string _username;
-    std::string _PWD;
+    std::string _currentchannel;
     std::string _host;
     s_UserMode  _mode;
     bool        _bAUTH;
