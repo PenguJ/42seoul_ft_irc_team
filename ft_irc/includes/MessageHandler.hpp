@@ -155,6 +155,7 @@ public:
 //BY jeojeon
     static const string ERR_TOOMANYTARGETS;
     static const string ERR_TOOMANYTARGETS_MSG;
+    static const string FORBIDDEN_TO_NICK;
 };
 
 //GLOBAL FUNCTION for class MessageHandler{}

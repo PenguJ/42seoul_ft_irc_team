@@ -68,6 +68,7 @@ const string MessageHandler::ERR_CHANOPRIVSNEEDED_MSG = " :You're not channel op
 //BY jeojeon
 const string MessageHandler::ERR_TOOMANYTARGETS = "407";
 const string MessageHandler::ERR_TOOMANYTARGETS_MSG = " :Duplicate recipients. No message delivered";
+const string MessageHandler::FORBIDDEN_TO_NICK = " !\"#$%&'()*+,-./:;<=>?@[\\]^`{|}~";
 
 
 //STANDARD: (순수)가상함수는 주석과 함께 명시적으로 정의한다. 양식은 다음과 같다.
@@ -361,38 +362,62 @@ void MessageHandler::NICK(s_Command CMD, User *user)
     {
         msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);                //send message , ERR_NEEDMOREPARAMS (461)
-    }
-    else 
-    {
-        string tmpNickname = CMD.parameters[0];
-        string originNickname = user->getNickname();
-        if (tmpNickname.length() == 0) // ERR_NONICKNAMEGIVEN 
-        {
-            msg = COL + Server::Host + SPACE + ERR_NONICKNAMEGIVEN + ERR_NONICKNAMEGIVEN_MSG + ENDL;
-            send(_FD, msg.c_str(), msg.size(), 0);
-        }
-        else if (tmpNickname.compare("default") == 0 || tmpNickname.length() > 9) // 닉네임 길이 제한   
-        {
-            msg = COL + Server::Host + SPACE + ERR_ERRONEUSNICKNAME + SPACE + tmpNickname + ERR_ERRONEUSNICKNAME_MSG + ENDL;
-            send(_FD, msg.c_str(), msg.size(), 0);
 
-            cout << "nickbad " << endl;
+        return ;
+    }
+
+    string tmpNickname = CMD.parameters[0];
+    string originNickname = user->getNickname();
+    if (tmpNickname.length() == 0) // ERR_NONICKNAMEGIVEN 
+    {
+        msg = COL + Server::Host + SPACE + ERR_NONICKNAMEGIVEN + ERR_NONICKNAMEGIVEN_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+
+        return ;
+    }
+    if (tmpNickname.compare("default") == 0 || tmpNickname.length() > 9) // 닉네임 길이 제한   
+    {
+        msg = COL + Server::Host + SPACE + ERR_ERRONEUSNICKNAME + SPACE + tmpNickname + ERR_ERRONEUSNICKNAME_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+
+        cout << "nickbad " << endl;
+
+        return ;
+    }
+
+    if (tmpNickname.find_first_of(FORBIDDEN_TO_NICK) != string::npos)
+    {
+        msg = COL + Server::Host + SPACE + ERR_ERRONEUSNICKNAME + SPACE + tmpNickname + ERR_ERRONEUSNICKNAME_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+
+        cout << "nickbad " << endl;
+
+        size_t pos = tmpNickname.find_first_of(FORBIDDEN_TO_NICK);
+
+        while (pos != string::npos)
+        {
+            tmpNickname.erase(pos, 1);
+            pos = tmpNickname.find_first_of(FORBIDDEN_TO_NICK);
         }
-        else if (_pDB->searchUser(tmpNickname) != 0) // 중복 닉이 있다면
+    }
+    if (tmpNickname.size() == 0 || _pDB->searchUser(tmpNickname) != 0) // 중복 닉이 있다면
+    {
+        if (_pDB->searchUser(tmpNickname) != 0)
         {
             msg = COL + Server::Host + SPACE + ERR_NICKNAMEINUSE + SPACE + AST + SPACE + tmpNickname + ERR_NICKNAMEINUSE_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);
         }
-        else // 정상 작동 
-        {
-            msg = COL + originNickname + SPACE + CMD.command + SPACE + COL + tmpNickname + ENDL;
-            user->setNickname(tmpNickname);
-            send(_FD, msg.c_str(), msg.size(), 0);
+        string unused = tmpNickname + "_";
+        while (_pDB->searchUser(unused))
+            unused += "_";
+        tmpNickname = unused;
+    }
+    msg = COL + originNickname + SPACE + CMD.command + SPACE + COL + tmpNickname + ENDL;
+    user->setNickname(tmpNickname);
+    send(_FD, msg.c_str(), msg.size(), 0);
 
 
-            cout << "nickgood" << endl;
-        }
-    } 
+    cout << "nickgood" << endl;
 }
 
 
