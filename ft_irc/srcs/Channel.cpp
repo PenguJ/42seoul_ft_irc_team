@@ -14,7 +14,7 @@
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
 	//PUBLIC:
-Channel::Channel(std::string& name, std::string &topic, s_ChannelMode &mode)
+Channel::Channel(string& name, string &topic, s_ChannelMode &mode)
     : _name(name)
     , _topic(topic)
     , _mode(mode)
@@ -26,12 +26,12 @@ Channel::~Channel()
 	//PRIVATE:
 Channel::Channel()
 {
-	std::cerr<<"error: never works"<<std::endl;
+	cerr<<"error: never works"<<endl;
 }
 
 Channel& Channel::operator=(const Channel& rRhs)
 {
-	std::cerr<<"error: never works"<<std::endl;
+	cerr<<"error: never works"<<endl;
 	if (this == &rRhs)
 	{
 		return (*this);
@@ -48,7 +48,7 @@ Channel& Channel::operator=(const Channel& rRhs)
 
 Channel::Channel(const Channel& rCopy)
 {
-	std::cerr<<"error: never works"<<std::endl;
+	cerr<<"error: never works"<<endl;
     (void)rCopy;
 }
 
@@ -77,22 +77,22 @@ Channel::Channel(const Channel& rCopy)
 //			그러나 둘 중 하나가 없는 경우, 명시적으로 표시한다.
 //			예를 들어, const가 아님에도 setter가 없다면, 클래스 외부에서 변경이 없음을 안다.
 	//PUBLIC:
-const std::string Channel::getName() const
+const string Channel::getName() const
 {
     return (_name);
 }
 
-void Channel::setName(std::string name)
+void Channel::setName(string name)
 {
     _name = name;
 }
 
-const std::string Channel::getTopic() const
+const string Channel::getTopic() const
 {
     return (_topic);
 }
 
-void Channel::setTopic(std::string topic)
+void Channel::setTopic(string topic)
 {
     _topic = topic;
 }

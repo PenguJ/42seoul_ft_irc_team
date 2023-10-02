@@ -29,7 +29,7 @@ Server::~Server()
     //PRIVATE:
 Server& Server::operator=(const Server& rRhs)
 {
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
 
     if (this == &rRhs)
     {
@@ -48,7 +48,7 @@ Server& Server::operator=(const Server& rRhs)
 Server::Server(const Server& rCopy)
 {
     (void)rCopy;
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
 }
 
 
@@ -92,7 +92,7 @@ void Server::execute()
     _servSock = socket(AF_INET, SOCK_STREAM, 0);
     if (_servSock < 0)
     {
-        throw std::runtime_error("error: socket()");
+        throw runtime_error("error: socket()");
     }
 }
 {
@@ -100,13 +100,13 @@ void Server::execute()
 
     if (setsockopt(_servSock, SOL_SOCKET, SO_REUSEADDR, &optVAL, sizeof(optVAL)))
     {
-        throw std::runtime_error("error: setsockopt()");
+        throw runtime_error("error: setsockopt()");
     }
 }
 {
     if (fcntl(_servSock, F_SETFL, O_NONBLOCK))
     {
-        throw std::runtime_error("error: fcntl()");
+        throw runtime_error("error: fcntl()");
     }
 }
 {
@@ -118,7 +118,7 @@ void Server::execute()
     servSockADDR.sin_port = htons(Port);
     if (bind(_servSock, (SOCKADDR*)&servSockADDR, sizeof(servSockADDR)) < 0)
     {
-        throw std::runtime_error("error: bind()");
+        throw runtime_error("error: bind()");
     }
 }
 {
@@ -126,13 +126,13 @@ void Server::execute()
 
     if (listen(_servSock, BACKLOG) < 0)
     {
-        throw std::runtime_error("error: listen()");
+        throw runtime_error("error: listen()");
     }
 }
     pollfd serv = {_servSock, POLLIN, 0};
 
     _PFDS.push_back(serv);
-    std::cout<<"[SERVER IS LISTENING...]"<<std::endl;
+    cout<<"[SERVER IS LISTENING...]"<<endl;
 }
 {
     _pDB = new Database;
@@ -140,37 +140,55 @@ void Server::execute()
 {	// Run IRC-server Process
     while (Server::bRunning)
     {
+//TESTCODE
+cout<<"IN SERV_MAIN LOOP"<<endl;
+
+
         int eventFD = -1;
-        std::vector<pollfd>::iterator iter = _PFDS.begin();
+        vector<pollfd>::iterator iter = _PFDS.begin();
 
         eventFD = poll(_PFDS.begin().base(), _PFDS.size(), -1);
         if (eventFD < 0)
         {
             break ;
         }
+        else if (eventFD == 0)
+        {
+//TESTCODE
+std::cout<<"assert(eventFD == 0)"<<std::endl;
+exit(1);
+        }
+
+std::cout<<"POLLFD size: "<<_PFDS.size()<<std::endl;
+std::cout<<"POLLFD state"<<std::endl;
+for (size_t i = 0; i < _PFDS.size(); ++i)
+{
+    cout<<_PFDS[i].fd<<"`s Event is -> "<<_PFDS[i].revents<<std::endl;
+}
 
         for (iter = _PFDS.begin(); iter != _PFDS.end(); ++iter)
         {
+std::cout<<"INTO POOL LOOP"<<std::endl;
             const bool NO_EVENT = (iter->revents != POLLIN);
             const bool SERV_POLLIN = (iter->revents & POLLIN) && \
                                     (iter->fd == _servSock);
             const bool CLNT_POLLIN = (iter->revents & POLLIN) && \
                                     (iter->fd != _servSock);
 
-// std::cout<<"for loop(servSock: "<<_servSock<<")"<<std::endl;
+// cout<<"for loop(servSock: "<<_servSock<<")"<<endl;
             if (NO_EVENT)
             {
-// std::cout<<"NO_EVENT   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<std::endl;
+// cout<<"NO_EVENT   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<endl;
                 continue ;
             }
             else if (SERV_POLLIN)
             {
-// std::cout<<"event SERV_POLLIN   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<std::endl;
+// cout<<"event SERV_POLLIN   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<endl;
                 SOCKADDR_IN ADDR;
                 socklen_t AddrLEN = sizeof(ADDR);
                 int clntFD = accept(_servSock, (SOCKADDR*)&ADDR, &AddrLEN);
                 // ERR CHECK
-                std::cout<<"[+] fd: "<<clntFD<<": accepted!"<<std::endl;
+                cout<<"[+] fd: "<<clntFD<<": accepted!"<<endl;
 
                 pollfd clnt = {clntFD, POLLIN, 0};
 
@@ -180,9 +198,9 @@ void Server::execute()
             }
             else if (CLNT_POLLIN)
             {
-// std::cout<<"event CLNT_POLLIN   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<std::endl;
+// cout<<"event CLNT_POLLIN   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<endl;
                 char cBUFF[MAX_MSG_LEN] = {0, };
-                std::string BUFF;
+                string BUFF;
                 ssize_t retVAL = 1;
 
                 retVAL = recv(iter->fd, cBUFF, MAX_MSG_LEN, 0);
@@ -192,40 +210,41 @@ void Server::execute()
                 /* if exist ErrCode about bad condition of server, then send */
                     goto ESCAPE_EVENT_SEARCHING_LOOP;
                 case 0:
-                    std::cout<<"[-] fd: "<<iter->fd<<": disconnected!"<<std::endl;
+                    cout<<"[-] fd: "<<iter->fd<<": disconnected!(Serv)"<<endl;
                     _pDB->clearUserAtDatabase(iter->fd);
-                    close(iter->fd);
                     _PFDS.erase(iter);
                     
-
+//TESTCODE
+std::cout<<"assert(recv == 0)"<<std::endl;
+exit(1);
                     goto ESCAPE_EVENT_SEARCHING_LOOP;
                 default:
                     BUFF = cBUFF;
 
-                    MessageHandler msgHandler(iter->fd, BUFF, _pDB);
+                    MessageHandler msgHandler(iter->fd, BUFF, _pDB, &_PFDS);
 
                     msgHandler.run();
 
                     goto ESCAPE_EVENT_SEARCHING_LOOP;
                 }
             }
+            else
+            {
+//TESTCODE
+cout<<"assert(UNKNOWN POLL EVENT)"<<endl;
+exit(1);
+            }
         } ESCAPE_EVENT_SEARCHING_LOOP:;
+//TESTCODE
+cout<<"OUT OF POOL LOOP"<<endl;
     }
 }
 {   // Close Server
-    _pDB->clearDatabase();
-    delete _pDB;
-    for (size_t i = 0; i < _PFDS.size(); ++i)
-    {
-        close (_PFDS[i].fd);
-    }
-    close(_servSock);
-    _PFDS.clear();
-    std::vector<pollfd>().swap(_PFDS);
+    exitProcess();
 }
 }
 
-void::Server::processExitError()
+void::Server::exitProcess()
 {
     if (_servSock == -1)
         return ;
@@ -234,13 +253,9 @@ void::Server::processExitError()
         _pDB->clearDatabase();
         delete _pDB;
     }
-    for (size_t i = 0; i < _PFDS.size(); ++i)
-    {
-        close (_PFDS[i].fd);
-    }
     close(_servSock);
     _PFDS.clear();
-    std::vector<pollfd>().swap(_PFDS);
+    vector<pollfd>().swap(_PFDS);
 }
 
     //PRIVATE:

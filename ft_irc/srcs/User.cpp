@@ -14,8 +14,8 @@
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
     //PUBLIC:
-User::User(int FD, std::string realname, std::string nickname, std::string username, std::string currentchannel, \
-        std::string host, bool bI, bool bS, bool bW, bool bO, bool bAUTH, bool bPWD)
+User::User(int FD, string realname, string nickname, string username, string currentchannel, \
+        string host, bool bI, bool bS, bool bW, bool bO, bool bAUTH, bool bPWD)
     : _FD(FD)
     , _realname(realname)
     , _nickname(nickname)
@@ -37,12 +37,12 @@ User::~User()
     //PRIVATE:
 User::User()
 {
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
 }
 
 User& User::operator=(const User& rRhs)
 {
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
     if (this == &rRhs)
     {
         return (*this);
@@ -59,7 +59,7 @@ User& User::operator=(const User& rRhs)
 
 User::User(const User& rCopy)
 {
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
     (void)rCopy;
 }
 
@@ -93,52 +93,52 @@ int User::getFD() const
     return (_FD);
 }
 
-const std::string User::getRealname() const
+const string User::getRealname() const
 {
     return (_realname);
 }
 
-void User::setRealname(std::string& realname)
+void User::setRealname(string& realname)
 {
     _realname = realname;
 }
 
-const std::string User::getNickname() const
+const string User::getNickname() const
 {
     return (_nickname);
 }
 
-void User::setNickname(std::string& nickname)
+void User::setNickname(string& nickname)
 {
     _nickname = nickname;
 }
 
-const std::string User::getUsername() const
+const string User::getUsername() const
 {
     return (_username);
 }
 
-void User::setUsername(std::string& username)
+void User::setUsername(string& username)
 {
     _username = username;
 }
 
-const std::string User::getCurrentChannel() const
+const string User::getCurrentChannel() const
 {
     return (_currentchannel);
 }
 
-void User::setCurrentChannel(std::string& channel)
+void User::setCurrentChannel(string& channel)
 {
     _currentchannel = channel;
 }
 
-const std::string User::getHost() const
+const string User::getHost() const
 {
     return (_host);
 }
 
-void User::setHost(std::string& host)
+void User::setHost(string& host)
 {
     _host = host;
 }

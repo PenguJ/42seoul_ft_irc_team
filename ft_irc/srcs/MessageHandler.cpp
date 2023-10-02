@@ -1,68 +1,74 @@
 #include <sstream>
 #include "../includes/MessageHandler.hpp"
 
+const string MessageHandler::ENDL = "\r\n";
+const string MessageHandler::COL = ":";
+const string MessageHandler::SPACE = " ";
+const string MessageHandler::AST = "*";
+const string MessageHandler::HASH = "#";
+const string MessageHandler::EXCL = "!";
+const string MessageHandler::AT = "@";
+const string MessageHandler::RPL_WELCOME = "001";
+const string MessageHandler::RPL_UMODEIS = "221";
+const string MessageHandler::RPL_NOTOPIC = "331";
+const string MessageHandler::RPL_TOPIC = "332";
+const string MessageHandler::ERR_UNKNOWNERROR = "400";
+const string MessageHandler::ERR_NOSUCHNICK = "401";
+const string MessageHandler::ERR_NOSUCHNICK_MSG = " :No such nick/channel";
+const string MessageHandler::ERR_NOSUCHSERVER = "402";
+const string MessageHandler::ERR_NOSUCHCHANNEL = "403";
+const string MessageHandler::ERR_NOSUCHCHANNEL_MSG = " :No such channel";
+const string MessageHandler::ERR_CANNOTSENDTOCHAN = "404";
+const string MessageHandler::ERR_CANNOTSENDTOCHAN_MSG = " :Cannot send to channel";
+const string MessageHandler::ERR_TOOMANYCHANNELS = "405";
+const string MessageHandler::ERR_NOORIGIN = "409";
+const string MessageHandler::ERR_NOORIGIN_MSG = " :No origin specified";
+const string MessageHandler::ERR_NORECIPIENT = "411";
+const string MessageHandler::ERR_NORECIPIENT_MSG = " :No recipient given";
+const string MessageHandler::ERR_NOTEXTTOSEND = "412";
+const string MessageHandler::ERR_NOTEXTTOSEND_MSG = " :No text to send";
 
+const string MessageHandler::ERR_UNKNOWNCOMMAND = "421";
+const string MessageHandler::ERR_UNKNOWNCOMMAND_MSG = " :Unknown command";
 
-const std::string MessageHandler::ENDL = "\r\n";
-const std::string MessageHandler::COL = ":";
-const std::string MessageHandler::SPACE = " ";
-const std::string MessageHandler::AST = "*";
-const std::string MessageHandler::HASH = "#";
-const std::string MessageHandler::RPL_WELCOME = "001";
-const std::string MessageHandler::RPL_UMODEIS = "221";
-const std::string MessageHandler::RPL_NOTOPIC = "331";
-const std::string MessageHandler::RPL_TOPIC = "332";
-const std::string MessageHandler::ERR_UNKNOWNERROR = "400";
-const std::string MessageHandler::ERR_NOSUCHNICK = "401";
-const std::string MessageHandler::ERR_NOSUCHNICK_MSG = " :No such nick/channel";
-const std::string MessageHandler::ERR_NOSUCHSERVER = "402";
-const std::string MessageHandler::ERR_NOSUCHCHANNEL = "403";
-const std::string MessageHandler::ERR_NOSUCHCHANNEL_MSG = " :No such channel";
-const std::string MessageHandler::ERR_CANNOTSENDTOCHAN = "404";
-const std::string MessageHandler::ERR_TOOMANYCHANNELS = "405";
-const std::string MessageHandler::ERR_NOORIGIN = "409";
-const std::string MessageHandler::ERR_NOORIGIN_MSG = " :No origin specified";
-const std::string MessageHandler::ERR_NORECIPIENT = "411";
-const std::string MessageHandler::ERR_NORECIPIENT_MSG = " :No recipient given";
-const std::string MessageHandler::ERR_NOTEXTTOSEND = "412";
-const std::string MessageHandler::ERR_NOTEXTTOSEND_MSG = " :No text to send";
+const string MessageHandler::ERR_NONICKNAMEGIVEN = "431";
+const string MessageHandler::ERR_NONICKNAMEGIVEN_MSG = " :No nickname given";
+const string MessageHandler::ERR_ERRONEUSNICKNAME = "432";
+const string MessageHandler::ERR_ERRONEUSNICKNAME_MSG = " :Erroneous nickname";
+const string MessageHandler::ERR_NICKNAMEINUSE = "433";
+const string MessageHandler::ERR_NICKNAMEINUSE_MSG = " :Nickname is already in use";
+const string MessageHandler::ERR_UNAVAILRESOURCE = "437";
+const string MessageHandler::ERR_UNAVAILRESOURCE_MSG = " :Channel is temporarily unavailable";
 
-const std::string MessageHandler::ERR_UNKNOWNCOMMAND = "421";
-const std::string MessageHandler::ERR_UNKNOWNCOMMAND_MSG = " :Unknown command";
+const string MessageHandler::ERR_USERNOTINCHANNEL = "441";
+const string MessageHandler::ERR_USERNOTINCHANNEL_MSG = " :They aren't on that channel";
+const string MessageHandler::ERR_NOTONCHANNEL = "442";
+const string MessageHandler::ERR_NOTONCHANNEL_MSG = " :You're not on that channel";
+const string MessageHandler::ERR_USERONCHANNEL = "443";
+const string MessageHandler::ERR_NOTREGISTERED = "451";
+const string MessageHandler::ERR_NOTREGISTERED_MSG = ":You have not registered";
+const string MessageHandler::ERR_NEEDMOREPARAMS = "461";
+const string MessageHandler::ERR_NEEDMOREPARAMS_MSG = " :Not enough parameters";
+const string MessageHandler::ERR_ALREADYREGISTERED = "462";
+const string MessageHandler::ERR_ALREADYREGISTERED_MSG = " :You may not reregister";
+const string MessageHandler::ERR_PASSWDMISMATCH = "464";
+const string MessageHandler::ERR_PASSWDMISMATCH_MSG = " :Password incorrect";
 
-const std::string MessageHandler::ERR_NONICKNAMEGIVEN = "431";
-const std::string MessageHandler::ERR_NONICKNAMEGIVEN_MSG = " :No nickname given";
-const std::string MessageHandler::ERR_ERRONEUSNICKNAME = "432";
-const std::string MessageHandler::ERR_ERRONEUSNICKNAME_MSG = " :Erroneous nickname";
-const std::string MessageHandler::ERR_NICKNAMEINUSE = "433";
-const std::string MessageHandler::ERR_NICKNAMEINUSE_MSG = " :Nickname is already in use";
-const std::string MessageHandler::ERR_UNAVAILRESOURCE = "437";
-const std::string MessageHandler::ERR_UNAVAILRESOURCE_MSG = " :Channel is temporarily unavailable";
+const string MessageHandler::ERR_CHANNELISFULL = "471";
+const string MessageHandler::ERR_CHANNELISFULL_MSG = " :Cannot join channel (+l)";
+const string MessageHandler::ERR_INVITEONLYCHAN = "473";
+const string MessageHandler::ERR_INVITEONLYCHAN_MSG = " :Cannot join channel (+i)";
+const string MessageHandler::ERR_BADCHANNELKEY = "475";
+const string MessageHandler::ERR_BADCHANNELKEY_MSG = " :Cannot join channel (+k)"; 
+const string MessageHandler::ERR_ERRONEUSCHANNELNAME = "479";
+const string MessageHandler::ERR_ERRONEUSCHANNELNAME_MSG = " :Channel name contains illegal characters";
+const string MessageHandler::ERR_CHANOPRIVSNEEDED = "482";
+const string MessageHandler::ERR_CHANOPRIVSNEEDED_MSG = " :You're not channel operator";
 
-const std::string MessageHandler::ERR_USERNOTINCHANNEL = "441";
-const std::string MessageHandler::ERR_USERNOTINCHANNEL_MSG = " :They aren't on that channel";
-const std::string MessageHandler::ERR_NOTONCHANNEL = "442";
-const std::string MessageHandler::ERR_NOTONCHANNEL_MSG = " :You're not on that channel";
-const std::string MessageHandler::ERR_USERONCHANNEL = "443";
-const std::string MessageHandler::ERR_NOTREGISTERED = "451";
-const std::string MessageHandler::ERR_NOTREGISTERED_MSG = ":You have not registered";
-const std::string MessageHandler::ERR_NEEDMOREPARAMS = "461";
-const std::string MessageHandler::ERR_NEEDMOREPARAMS_MSG = " :Not enough parameters";
-const std::string MessageHandler::ERR_ALREADYREGISTERED = "462";
-const std::string MessageHandler::ERR_ALREADYREGISTERED_MSG = " :You may not reregister";
-const std::string MessageHandler::ERR_PASSWDMISMATCH = "464";
-const std::string MessageHandler::ERR_PASSWDMISMATCH_MSG = " :Password incorrect";
+//BY jeojeon
+const string MessageHandler::ERR_TOOMANYTARGETS = "407";
+const string MessageHandler::ERR_TOOMANYTARGETS_MSG = " :Duplicate recipients. No message delivered";
 
-const std::string MessageHandler::ERR_CHANNELISFULL = "471";
-const std::string MessageHandler::ERR_CHANNELISFULL_MSG = " :Cannot join channel (+l)";
-const std::string MessageHandler::ERR_INVITEONLYCHAN = "473";
-const std::string MessageHandler::ERR_INVITEONLYCHAN_MSG = " :Cannot join channel (+i)";
-const std::string MessageHandler::ERR_BADCHANNELKEY = "475";
-const std::string MessageHandler::ERR_BADCHANNELKEY_MSG = " :Cannot join channel (+k)"; 
-const std::string MessageHandler::ERR_ERRONEUSCHANNELNAME = "479";
-const std::string MessageHandler::ERR_ERRONEUSCHANNELNAME_MSG = " :Channel name contains illegal characters";
-const std::string MessageHandler::ERR_CHANOPRIVSNEEDED = "482";
-const std::string MessageHandler::ERR_CHANOPRIVSNEEDED_MSG = " :You're not channel operator";
 
 //STANDARD: (순수)가상함수는 주석과 함께 명시적으로 정의한다. 양식은 다음과 같다.
 //				/*virtual*/void Bar::Baz() {...}
@@ -78,10 +84,11 @@ const std::string MessageHandler::ERR_CHANOPRIVSNEEDED_MSG = " :You're not chann
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
     //PUBLIC:
-MessageHandler::MessageHandler(int FD, std::string &BUFF, Database * const pDB)
+MessageHandler::MessageHandler(int FD, string &BUFF, Database * const pDB, vector<pollfd>* pPFDS)
     : _FD(FD)
     , _BUFF(BUFF)
     , _pDB(pDB)
+    , _pPFDS(pPFDS)
 {   }
 
 MessageHandler::~MessageHandler()
@@ -92,12 +99,12 @@ MessageHandler::MessageHandler()
     : _FD(0)
     , _pDB(NULL)
 {
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
 }
 
 MessageHandler& MessageHandler::operator=(const MessageHandler& rRhs)
 {
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
     if (this == &rRhs)
     {
         return (*this);
@@ -116,7 +123,7 @@ MessageHandler::MessageHandler(const MessageHandler& rCopy)
     : _FD(0)
     , _pDB(NULL)
 {
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
     (void)rCopy;
 }
 
@@ -155,14 +162,14 @@ MessageHandler::MessageHandler(const MessageHandler& rCopy)
     //PUBLIC:
 void MessageHandler::run()
 {
-    std::cout<<"FD["<<_FD<<"]: "<<_BUFF<<"\n"<<std::endl;
+    cout<<"in MessageHandler::FD["<<_FD<<"]: "<<_BUFF<<endl;
 
     while (_BUFF.size())
     {
         // parse command
             // get a command line
         const size_t endOfPresentCMD = _BUFF.find("\r\n");
-        std::string presentCMD;
+        string presentCMD;
 
         if (endOfPresentCMD == _BUFF.npos)
         {
@@ -173,9 +180,9 @@ void MessageHandler::run()
         _BUFF.erase(0, endOfPresentCMD + 2);
 
 
-            // parse std::string to s_Command
+            // parse string to s_Command
         s_Command command;
-        std::vector<std::string> TMP;
+        vector<string> TMP;
 
         if (presentCMD[0] == ':')
         {
@@ -201,15 +208,28 @@ void MessageHandler::run()
         TMP.erase(TMP.begin());
         command.parameters = TMP;
 {//TEST CODE
-    std::cout<<"[prefix]: "<<command.prefix<<std::endl;
-    std::cout<<"[command]: "<<command.command<<std::endl;
-    std::cout<<"[params]"<<std::endl;
-    for (size_t i = 0; i < command.parameters.size(); ++i)
-        std::cout<<"    ("<<i<<"): "<<command.parameters[i]<<std::endl;
-    std::cout<<"[suffix]: "<<command.suffix<<std::endl<<std::endl;
+    // cout<<"[prefix]: "<<command.prefix<<endl;
+    cout<<"[command]: "<<command.command<<endl;
+    // cout<<"[params]"<<endl;
+    // for (size_t i = 0; i < command.parameters.size(); ++i)
+    //     cout<<"    ("<<i<<"): "<<command.parameters[i]<<endl;
+    // cout<<"[suffix]: "<<command.suffix<<endl<<endl;
 }
     User *user = _pDB->searchUser(_FD); // 유저가 존재하는지, 유저 정보변경등에 사용
     bool disconnect = 0; // while문 break되야 하는지 판단하는 플래그
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         if (command.command == "CAP")
         {
@@ -219,7 +239,7 @@ void MessageHandler::run()
         {
             if (command.command == "PRIVMSG")
             {
-                
+                PRIVMSG(command, user);
             }
             else if (command.command == "PING")
             {
@@ -267,7 +287,7 @@ void MessageHandler::run()
             }
             else if (command.command == "QUIT")
             {
-
+                QUIT(command, user);
             }
             else if (command.command == "KILL")
             {
@@ -287,12 +307,12 @@ void MessageHandler::run()
 
 
     //PRIVATE:
-std::vector<std::string> MessageHandler::split(const std::string& STR, char DL)
+vector<string> MessageHandler::split(const string& STR, char DL)
 {
     const size_t FIRST_CAPACITY = 5;
-    std::istringstream ISS(STR);
-    std::string BUFF;
-    std::vector<std::string> RET;
+    istringstream ISS(STR);
+    string BUFF;
+    vector<string> RET;
  
     RET.reserve(FIRST_CAPACITY);
 
@@ -304,6 +324,14 @@ std::vector<std::string> MessageHandler::split(const std::string& STR, char DL)
     return (RET);
 }
 
+void MessageHandler::multicast(vector<string> NICKs, string STR)
+{
+    for (size_t i = 0; i < NICKs.size(); ++i)
+    {
+        send(_pDB->searchUser(NICKs[i])->getFD(), STR.c_str(), STR.size(), 0);
+    }
+}
+
 
 void MessageHandler::CAP(s_Command CMD, User *user)
 {
@@ -311,15 +339,16 @@ void MessageHandler::CAP(s_Command CMD, User *user)
             (void)CMD;
             if (user == NULL)
             {
-                std::string tmp = "default";
+                string tmp = "default";
                 // _FD를 제외하고 기본값만을 가진 user를 만든다.
                 _pDB->addUserAtPairVec(_FD,tmp, tmp, tmp, tmp, tmp, 0,0,0,0,0,0);
             }
 }
 
+
 void MessageHandler::NICK(s_Command CMD, User *user)
 {
-    std::string msg;
+    string msg;
 
     if (user->getBoolAuthority() == 0)
     {
@@ -335,8 +364,8 @@ void MessageHandler::NICK(s_Command CMD, User *user)
     }
     else 
     {
-        std::string tmpNickname = CMD.parameters[0];
-        std::string originNickname = user->getNickname();
+        string tmpNickname = CMD.parameters[0];
+        string originNickname = user->getNickname();
         if (tmpNickname.length() == 0) // ERR_NONICKNAMEGIVEN 
         {
             msg = COL + Server::Host + SPACE + ERR_NONICKNAMEGIVEN + ERR_NONICKNAMEGIVEN_MSG + ENDL;
@@ -347,7 +376,7 @@ void MessageHandler::NICK(s_Command CMD, User *user)
             msg = COL + Server::Host + SPACE + ERR_ERRONEUSNICKNAME + SPACE + tmpNickname + ERR_ERRONEUSNICKNAME_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);
 
-            std::cout << "nickbad " << std::endl;
+            cout << "nickbad " << endl;
         }
         else if (_pDB->searchUser(tmpNickname) != 0) // 중복 닉이 있다면
         {
@@ -361,14 +390,15 @@ void MessageHandler::NICK(s_Command CMD, User *user)
             send(_FD, msg.c_str(), msg.size(), 0);
 
 
-            std::cout << "nickgood" << std::endl;
+            cout << "nickgood" << endl;
         }
     } 
 }
 
+
 void MessageHandler::USER(s_Command CMD, User *user)
 {
-    std::string msg;
+    string msg;
     if (user->getBoolAuthority() == 0)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
@@ -383,7 +413,7 @@ void MessageHandler::USER(s_Command CMD, User *user)
     }
     else
     {
-        std::string tmpUsername = CMD.parameters[0];
+        string tmpUsername = CMD.parameters[0];
         if (user->getUsername().compare("default") != 0) // 이미 auth 된 유저이면서 초기설정을 이미 한 경우
         {
             msg = COL + Server::Host + SPACE + ERR_ALREADYREGISTERED + SPACE + user->getNickname() + SPACE + CMD.command + ERR_ALREADYREGISTERED_MSG + ENDL;
@@ -399,17 +429,19 @@ void MessageHandler::USER(s_Command CMD, User *user)
             user->setUsername(tmpUsername);
             if (CMD.suffix.length())
                 user->setRealname(CMD.suffix);
-            std::string welcome = " :Welcome to ft_irc! ";
+            string welcome = " :Welcome to ft_irc! ";
             msg = COL + Server::Host + SPACE + RPL_WELCOME + SPACE + user->getNickname() + welcome + tmpUsername + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0); 
-            std::cout << welcome << std::endl;
+            cout << welcome << endl;
         }
     }
 }
 
+
 void MessageHandler::PASS(s_Command CMD, User *user)
 {
-    std::string msg;
+    string msg;
+
     if (user->getBoolAuthority())
         return ;
     if (CMD.parameters.size() < 1) // 인자 부족
@@ -429,17 +461,18 @@ void MessageHandler::PASS(s_Command CMD, User *user)
     else // 비밀번호 맞을떄
     {
         bool auth = 1;
-        std::cout<< "good" << std::endl;
+        cout<< "good" << endl;
         user->setBoolAuthority(auth);
     } 
 }
+
 
 void MessageHandler::MODE(s_Command CMD, User *user)
 {
     if (!(user->getBoolAuthority()))
         return; 
 
-    std::string msg;
+    string msg;
 
     if (CMD.parameters.size() < 1)
     {
@@ -448,7 +481,7 @@ void MessageHandler::MODE(s_Command CMD, User *user)
     }
     else
     {
-        std::string target = CMD.parameters[0];
+        string target = CMD.parameters[0];
         if (target[0] == '#') //channel
         {
             // 채널 있는지 -> 채널 어드민인지 순서대로 확인 필 
@@ -463,19 +496,20 @@ void MessageHandler::MODE(s_Command CMD, User *user)
             // Usermode 는 ft_irc에서 요구 X이지만 혹시 request 됐을경우 default인 RPL_UMODEIS (221)의 +i 를 넣어줌 
             else 
             {
-                std::string inv_mode = "+i";
+                string inv_mode = "+i";
                 msg = COL + Server::Host + SPACE + RPL_UMODEIS + SPACE + target + SPACE + COL + inv_mode + ENDL;
                 send(_FD, msg.c_str(), msg.size(), 0);
                 
-                std::cout << "MODE USER OK " << std::endl;
+                cout << "MODE USER OK " << endl;
             }
         }
     }
 }
 
+
 void MessageHandler::JOIN(s_Command CMD, User *user)
 {
-    std::string msg;
+    string msg;
     if (user->getBoolAuthority() == 0)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
@@ -490,22 +524,22 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
     }
     else
     {
-        std::vector<std::string>channels = split(CMD.parameters[0],',');
-        std::vector<std::string>keylist;
+        vector<string>channels = split(CMD.parameters[0],',');
+        vector<string>keylist;
 
         if (CMD.parameters.size() > 1) // 키 까지 주어졌을경우
         {
-            std::vector<std::string>keylist = split(CMD.parameters[1],','); // JOIN test1,test2,test3 123 처럼 들어오면 클라이언트에서 123,x,x로 바꿔줘서 들어오기 때문에 두 벡터의 size는 같을것임
+            vector<string>keylist = split(CMD.parameters[1],','); // JOIN test1,test2,test3 123 처럼 들어오면 클라이언트에서 123,x,x로 바꿔줘서 들어오기 때문에 두 벡터의 size는 같을것임
             while (channels.size() > keylist.size()) // 혹시 모를 index out of range 방지 
                 keylist.push_back("x");
         }
         for (size_t i = 0; i < channels.size(); ++i)
         {
             int FD = _FD;
-            std::string channel_name = channels[i];
-            std::string user_nick = user->getNickname();
-            std::string user_real = user->getRealname();
-            std::string msg; 
+            string channel_name = channels[i];
+            string user_nick = user->getNickname();
+            string user_real = user->getRealname();
+            string msg; 
             if (!channel_name.empty())
             {
                 if (channels[i][0] == '#') // '#' 제거 
@@ -516,7 +550,7 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
 
                 if (CHANNEL == NULL) // 채널이 없는 경우 
                 {   
-                    std::string topic_tmp = ""; // 기본값 "" 라고 명시 되어있음
+                    string topic_tmp = ""; // 기본값 "" 라고 명시 되어있음
 
                     ChannelMode CM;
                     CM.bO = 0;
@@ -601,9 +635,10 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
     }
 }
 
+
 void MessageHandler::TOPIC(s_Command CMD, User *user)
 {
-    std::string msg;
+    string msg;
     if (user->getBoolAuthority() == 0)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
@@ -618,8 +653,8 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
         return ;              
     }
 
-    std::string nickname = user->getNickname();
-    std::string channelname = CMD.parameters[0]; //클라이언트에서 자동으로 해쉬 붙혀줌
+    string nickname = user->getNickname();
+    string channelname = CMD.parameters[0]; //클라이언트에서 자동으로 해쉬 붙혀줌
     if (channelname[0] == '#') // '#' 제거 
     {
         channelname = channelname.substr(1);
@@ -629,10 +664,10 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
 
 
     //DEBUG
-    std::cout << "param cnt" << CMD.parameters.size() << std::endl;
+    cout << "param cnt" << CMD.parameters.size() << endl;
     if (channel != NULL)
-        std::cout << "channel topic" <<  channel->getTopic() << std::endl;
-    std::cout << CMD.suffix.empty() << std::endl;
+        cout << "channel topic" <<  channel->getTopic() << endl;
+    cout << CMD.suffix.empty() << endl;
 
     if (channel == NULL) //채널이 없을경우
     {
@@ -643,7 +678,7 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + channelname + ERR_NOTONCHANNEL_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
-        std::cout << "no auth?" << std::endl;
+        cout << "no auth?" << endl;
     }
     else if (CMD.parameters.size() == 1  && CMD.suffix.empty()) // channel의 topic 조회
     {
@@ -656,7 +691,7 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
         {
             if (channel->getTopic() == "") // 토픽이 없을경우
             {   
-                std::string RPL_TOPIC_MSG = " :No topic is set";
+                string RPL_TOPIC_MSG = " :No topic is set";
                 msg = COL + Server::Host + SPACE + RPL_NOTOPIC + SPACE + nickname + SPACE + channelname + RPL_TOPIC_MSG + ENDL;
                 send(_FD, msg.c_str(), msg.size(), 0);  
             }
@@ -669,7 +704,7 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
     }
     else if (CMD.parameters.size() == 1 && !(CMD.suffix.empty())) // channel의 topic 변경
     {
-        std::cout << "HERE" << std::endl;
+        cout << "HERE" << endl;
         if (channel->getChannelMode().bT && auth == 1) // 채널 mode +t이면서 권한 없을 시 
         {
             msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
@@ -677,27 +712,28 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
         }
         else
         {
-            std::vector<std::string>suf_split = split(CMD.suffix,' ');
+            vector<string>suf_split = split(CMD.suffix,' ');
             if (suf_split.size() > 1) // 클라이언트에서 서버이름에 #을 붙히면 suffix 그대로 오고, 안붙히면 suffix는 서버이름+topic으로 오기때문에 구분 
             {
                 channel->setTopic(suf_split[1]);
-                std::cout << suf_split[1] << "is topic!" << std::endl;
+                cout << suf_split[1] << "is topic!" << endl;
             }
             else
             {
                 channel->setTopic(suf_split[0]);
-                std::cout << suf_split[0] << "is topic!" << std::endl;
+                cout << suf_split[0] << "is topic!" << endl;
             }
             msg = COL + Server::Host + SPACE + RPL_TOPIC + SPACE + nickname + SPACE + channelname + SPACE + COL + channel->getTopic() + ENDL;  // tcpflow상으로 설정하고 끝이긴함.
-            std::cout << msg << std::endl;
+            cout << msg << endl;
             send(_FD, msg.c_str(), msg.size(), 0);
         }
     }
 }
 
+
 void MessageHandler::PING(s_Command CMD, User *user)
 {
-    std::string msg;
+    string msg;
 
     if (user->getBoolAuthority() == 0)
     {
@@ -718,12 +754,211 @@ void MessageHandler::PING(s_Command CMD, User *user)
     }
     else
     {
-        std::string PONG = "PONG";
+        string PONG = "PONG";
         msg = COL + Server::Host + SPACE + PONG + SPACE + Server::Host + CMD.parameters[0] + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);   
 
-        std::cout << "PONG SENTED!!" << std::endl;                   
+        cout << "PONG SENTED!!" << endl;                   
     }
+}
+
+
+void MessageHandler::PRIVMSG(s_Command CMD, User* user)
+{
+    const size_t FIRST_CAPACITY = 5;
+    vector<string> receiver;
+    string msg;
+
+    receiver.reserve(FIRST_CAPACITY);
+{   //check error before try send to receiver & parse receiver
+    if (user->getBoolAuthority() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+
+        return ;
+    }
+
+    //ERR_NORECIPIENT to sender
+    if (CMD.parameters.size() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NORECIPIENT + SPACE + user->getNickname() + ERR_NORECIPIENT_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+
+        return ;
+    }
+
+    //ERR_NOTEXTTOSEND to sender
+    if (CMD.suffix.size() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOTEXTTOSEND + SPACE + user->getNickname() + ERR_NOTEXTTOSEND_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+
+        return ;
+    }
+
+    receiver = split(CMD.parameters[0], ',');
+
+    for (size_t i = 0; i < receiver.size(); ++i)
+    {
+        for (size_t j = 0; j < receiver.size(); ++j)
+        {
+            //ERR_TOOMANYTARGETS to sender
+            if (i != j && receiver[i] == receiver[j])
+            {
+                msg = COL + Server::Host + SPACE + ERR_TOOMANYTARGETS + SPACE + user->getNickname() + SPACE + receiver[i] + ERR_TOOMANYTARGETS_MSG + ENDL;
+                send(_FD, msg.c_str(), msg.size(), 0);
+
+                return ;
+            }
+        }
+    }
+}
+{   // send msg with checking err send to user
+    const int FIRST_CAPACITY = 15;
+    string PRIVMSG = "PRIVMSG";
+
+    for (size_t i = 0; i < receiver.size(); ++i)
+    {
+        if (receiver[i][0] == '&' || receiver[i][0] == '#') // to channel
+        {
+            Channel* pChannel = NULL;
+            vector<string> chanReceivers;
+
+            chanReceivers.resize(FIRST_CAPACITY);
+
+            receiver[i].erase(0, 1);
+            pChannel = _pDB->searchChannel(receiver[i]);
+            
+            // ERR_CANNOTSENDTOCHAN
+            if (pChannel == NULL || _pDB->searchUser(_FD) == NULL)
+            {
+                msg = COL + Server::Host + SPACE + ERR_CANNOTSENDTOCHAN + SPACE + user->getNickname() + SPACE + HASH + receiver[i] + ERR_CANNOTSENDTOCHAN_MSG + ENDL;
+                send(_FD, msg.c_str(), msg.size(), 0);
+
+                msg.clear();
+
+                continue ;
+            }
+
+            msg = COL + user->getNickname() + EXCL + user->getUsername() + AT + Server::Host + SPACE + PRIVMSG + SPACE + HASH + receiver[i] + SPACE + COL + CMD.suffix + ENDL;
+
+            chanReceivers = _pDB->getUsersAtChannel(receiver[i]);
+            vector<string>::iterator iter = chanReceivers.begin();
+
+            for (; iter != chanReceivers.end(); ++iter)
+            {
+                if (*iter == _pDB->searchUser(_FD)->getNickname())
+                {
+                    chanReceivers.erase(iter);
+
+                    break ;
+                }
+            }
+
+            multicast(chanReceivers, msg);
+
+            msg.clear();
+        }
+        else // to user
+        {
+            User* pUser = NULL;
+
+            pUser = _pDB->searchUser(receiver[i]);
+
+            //ERR_NOSUCHNICK
+            if (pUser == NULL)
+            {
+                msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + user->getNickname() + SPACE + receiver[i] + ERR_NOSUCHNICK_MSG + ENDL;
+                send(_FD, msg.c_str(), msg.size(), 0);
+
+                msg.clear();
+
+                continue ;
+            }
+
+            msg = COL + user->getNickname() + EXCL + user->getUsername() + AT + Server::Host + SPACE + PRIVMSG + SPACE + receiver[i] + SPACE + COL + CMD.suffix + ENDL;
+            send(pUser->getFD(), msg.c_str(), msg.size(), 0);
+
+            msg.clear();
+        }
+    }    
+}
+}
+
+void MessageHandler::QUIT(s_Command CMD, User* user)
+{
+    string msg;
+    string QUIT = "QUIT";
+    string reason = "Client Quit";
+{ // check auth
+    if (user->getBoolAuthority() == 0)
+    {
+        msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+
+        return ;
+    }
+}
+{ // make msg to sending users(requirer & the users of in-channel with requirer)
+    if (CMD.suffix.size())
+    {
+        reason = CMD.suffix;
+    }
+
+    msg = COL + user->getNickname() + EXCL + user->getUsername() + AT + Server::Host + SPACE + QUIT + SPACE + COL + reason + ENDL;
+}
+{ // send to requirer
+    send(_FD, msg.c_str(), msg.size(), 0);
+}
+{ // find channels the quit-requirer is being & send
+    const int FIRST_CAPACITY_OF_CHAN = 5;
+    const int FIRST_CAPACITY_OF_RECVS = 15;
+    vector<string> quitUserChannels;
+    vector<string> chanReceivers;
+
+    quitUserChannels.reserve(FIRST_CAPACITY_OF_CHAN);
+    chanReceivers.reserve(FIRST_CAPACITY_OF_RECVS);
+
+    quitUserChannels = _pDB->getChannelsWithUser(user->getNickname());
+
+    for (size_t i = 0; i < quitUserChannels.size(); ++i)
+    {
+        chanReceivers = _pDB->getUsersAtChannel(quitUserChannels[i]);
+        vector<string>::iterator iter = chanReceivers.begin();
+
+        for (; iter != chanReceivers.end(); ++iter)
+        {
+            if (*iter == _pDB->searchUser(_FD)->getNickname())
+            {
+                chanReceivers.erase(iter);
+
+                break ;
+            }
+        }
+
+        multicast(chanReceivers, msg);
+    }
+}
+{ // do removing user process at the server
+    vector<pollfd>::iterator iter = (*_pPFDS).begin();
+
+    cout<<"[-] fd: "<<_FD<<": disconnected!(QUIT)"<<endl;
+std::cout<<"OUT OF (QUIT)1"<<std::endl;
+    _pDB->clearUserAtDatabase(_FD);
+std::cout<<"OUT OF (QUIT)2"<<std::endl;
+    for (; iter != (*_pPFDS).end(); ++iter)
+    {
+        if ((*iter).fd == _FD)
+        {
+            (*_pPFDS).erase(iter);
+            if (iter == (*_pPFDS).end())
+                break ;
+        }
+    }
+std::cout<<"OUT OF (QUIT)3"<<std::endl;
+    //remove at _PDFS && "[-] fd msg"
+}
 }
 //****************************************************************************/
 //GLOBAL FUNCTION ************************************************************/

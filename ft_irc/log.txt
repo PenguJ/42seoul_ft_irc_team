@@ -1,0 +1,51 @@
+[SERVER IS LISTENING...]
+IN SERV_MAIN LOOP
+POLLFD size: 1
+POLLFD state
+3`s Event is -> 1
+INTO POOL LOOP
+[+] fd: 4: accepted!
+OUT OF POOL LOOP
+IN SERV_MAIN LOOP
+POLLFD size: 2
+POLLFD state
+3`s Event is -> 0
+4`s Event is -> 1
+INTO POOL LOOP
+INTO POOL LOOP
+in MessageHandler::FD[4]: CAP LS
+PASS 1234
+NICK tester_1
+USER jeojeon jeojeon localhost :jeojeon
+
+[command]: CAP
+[command]: PASS
+good
+[command]: NICK
+nickgood
+[command]: USER
+ :Welcome to ft_irc! 
+OUT OF POOL LOOP
+IN SERV_MAIN LOOP
+POLLFD size: 2
+POLLFD state
+3`s Event is -> 0
+4`s Event is -> 1
+INTO POOL LOOP
+INTO POOL LOOP
+in MessageHandler::FD[4]: MODE tester_1 +i
+
+[command]: MODE
+MODE USER OK 
+OUT OF POOL LOOP
+IN SERV_MAIN LOOP
+POLLFD size: 2
+POLLFD state
+3`s Event is -> 0
+4`s Event is -> 1
+INTO POOL LOOP
+INTO POOL LOOP
+in MessageHandler::FD[4]: QUIT :leaving
+
+[command]: QUIT
+[-] fd: 4: disconnected!(QUIT)

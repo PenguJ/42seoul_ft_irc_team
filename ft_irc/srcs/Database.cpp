@@ -16,11 +16,11 @@
     //PUBLIC:
 Database::Database()
 {
-    const size_t FIRST_CAPACITY = 255;
+    const size_t FIRST_CAPACITY = 50;
 
     _users.reserve(FIRST_CAPACITY);
     _users.reserve(FIRST_CAPACITY);
-    _channelUserTable.reserve(FIRST_CAPACITY * FIRST_CAPACITY);
+    _channelUserTable.reserve(FIRST_CAPACITY);
 }
 
 Database::~Database()
@@ -38,7 +38,7 @@ Database::~Database()
     //PRIVATE:
 Database& Database::operator=(const Database& rRhs)
 {
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
     if (this == &rRhs)
     {
         return (*this);
@@ -55,7 +55,7 @@ Database& Database::operator=(const Database& rRhs)
 
 Database::Database(const Database& rCopy)
 {
-    std::cerr<<"error: never works"<<std::endl;
+    cerr<<"error: never works"<<endl;
     (void)rCopy;
 }
 
@@ -96,31 +96,38 @@ void Database::clearDatabase()
 {
     for (size_t i = 0; i < _users.size(); ++i)
     {
-        close(_users[i].first);
-        _users[i].first = -1;
-        delete _users[i].second;
-        _users[i].second = NULL;
+        close(_users[i]->first);
+        _users[i]->first = -1;
+        delete _users[i]->second;
+        _users[i]->second = NULL;
+        delete _users[i];
     }
     for (size_t i = 0; i < _channels.size(); ++i)
     {
-        _channels[i].first.clear();
-        delete _channels[i].second;
-        _channels[i].second = NULL;
+        _channels[i]->first.clear();
+        delete _channels[i]->second;
+        _channels[i]->second = NULL;
+        delete _channels[i];
     }
     for (size_t i = 0; i < _channelUserTable.size(); ++i)
     {
-        _channelUserTable[i]._pUserPair = NULL;
-        _channelUserTable[i]._pChannelPair = NULL;
-        _channelUserTable[i]._bOP = false;
+        _channelUserTable[i]->_pUserPair = NULL;
+        _channelUserTable[i]->_pChannelPair = NULL;
+        _channelUserTable[i]->_bOP = false;
+        delete _channelUserTable[i];
     }
 }
 
+
+
+
+
 void Database::addUserAtPairVec(int FD, 
-                                std::string realname, \
-                                std::string nickname, \
-                                std::string username, \
-                                std::string PWD, \
-                                std::string host, \
+                                string realname, \
+                                string nickname, \
+                                string username, \
+                                string PWD, \
+                                string host, \
                                 bool bI, \
                                 bool bS, \
                                 bool bW, \
@@ -128,18 +135,23 @@ void Database::addUserAtPairVec(int FD,
                                 bool bAUTH, \
                                 bool bPWD)
 {
-    UserPair tmp;
+    UserPair* tmp = new UserPair;
 
-    tmp.first = FD;
-    tmp.second = new User(FD, realname, nickname, username, PWD, host, bI, bS, bW, bO, bAUTH, bPWD);
+    tmp->first = FD;
+    tmp->second = new User(FD, realname, nickname, username, PWD, host, bI, bS, bW, bO, bAUTH, bPWD);
 
     _users.push_back(tmp);
 }
 
-void Database::clearUserAtDatabase(int& FD)
+
+
+
+
+
+void Database::clearUserAtDatabase(int FD)
 {
 {   // remove channel-user info in ChannelUserTable
-    std::vector<s_ChannelUserNode>::iterator iter = _channelUserTable.begin();
+    vector<s_ChannelUserNode* >::iterator iter = _channelUserTable.begin();
 
     while (true)
     {
@@ -147,8 +159,9 @@ void Database::clearUserAtDatabase(int& FD)
         {
             break ;
         }
-        else if (iter->_pUserPair->first == FD)
+        else if ((*iter)->_pUserPair->first == FD)
         {
+            delete (*iter);
             _channelUserTable.erase(iter);
             continue ;
         }
@@ -167,10 +180,11 @@ void Database::clearUserAtDatabase(int& FD)
         {
             break ;
         }
-        else if (iter->first == FD)
+        else if ((*iter)->first == FD)
         {
-            close(iter->first);
-            delete iter->second;
+            close((*iter)->first);
+            delete (*iter)->second;
+            delete (*iter);
             _users.erase(iter);
             break ;
         }
@@ -182,39 +196,31 @@ void Database::clearUserAtDatabase(int& FD)
 }
 }
 
+
+
+
+
 void Database::createChannelAtDatabase(User* pMaker, \
-                                        std::string& name, \
-                                        std::string& topic, \
-                                        s_ChannelMode& mode)
+                                        string name, \
+                                        string topic, \
+                                        s_ChannelMode mode)
 {
-    ChannelPair tmp;
+    ChannelPair* tmp = new ChannelPair;
 
-    tmp.first = name;
-    tmp.second = new Channel(name, topic, mode);
-
+    tmp->first = name;
+    tmp->second = new Channel(name, topic, mode);
     _channels.push_back(tmp);
-
-    for (size_t i = 0; i < _users.size(); ++i)
-    {
-        if (_users[i].second == pMaker)
-        {
-            s_ChannelUserNode tmp2;
-
-            tmp2._pUserPair = &_users[i];
-            tmp2._pChannelPair = &(*_channels.rbegin());
-            tmp2._bOP = true;
-
-            _channelUserTable.push_back(tmp2);
-
-            break ;
-        }
-    }
+    joinChannel(pMaker->getFD(), name);
 }
 
-void Database::clearChannelAtDatabase(std::string& name)
+
+
+
+
+void Database::clearChannelAtDatabase(string& name)
 {
 {   // remove channel-user info in ChannelUserTable
-    std::vector<s_ChannelUserNode>::iterator iter = _channelUserTable.begin();
+    vector<s_ChannelUserNode* >::iterator iter = _channelUserTable.begin();
 
     while (true)
     {
@@ -222,8 +228,9 @@ void Database::clearChannelAtDatabase(std::string& name)
         {
             break ;
         }
-        else if (iter->_pChannelPair->first == name)
+        else if ((*iter)->_pChannelPair->first == name)
         {
+            delete (*iter);
             _channelUserTable.erase(iter);
             continue ;
         }
@@ -242,9 +249,10 @@ void Database::clearChannelAtDatabase(std::string& name)
         {
             break ;
         }
-        else if (iter->first == name)
+        else if ((*iter)->first == name)
         {
-            delete iter->second;
+            delete (*iter)->second;
+            delete (*iter);
             _channels.erase(iter);
             break ;
         }
@@ -256,24 +264,28 @@ void Database::clearChannelAtDatabase(std::string& name)
 }
 }
 
-void Database::joinChannel(int& FD, std::string& chanName)
+
+
+
+
+void Database::joinChannel(int FD, string chanName)
 {
-    s_ChannelUserNode tmp;
+    s_ChannelUserNode* tmp = new s_ChannelUserNode;
 
     for (size_t i = 0; i < _users.size(); ++i)
     {
-        if (_users[i].first == FD)
+        if (_users[i]->first == FD)
         {
-            tmp._pUserPair = &_users[i];
+            tmp->_pUserPair = _users[i];
 
             break ;
         }
     }
     for (size_t i = 0; i < _channels.size(); ++i)
     {
-        if (_channels[i].first == chanName)
+        if (_channels[i]->first == chanName)
         {
-            tmp._pChannelPair = &_channels[i];
+            tmp->_pChannelPair = _channels[i];
 
             break ;
         }
@@ -281,15 +293,20 @@ void Database::joinChannel(int& FD, std::string& chanName)
     _channelUserTable.push_back(tmp);
 }
 
-void Database::leaveChannel(int& FD, std::string& chanName)
+
+
+
+
+void Database::leaveChannel(int& FD, string& chanName)
 {
-    std::vector<s_ChannelUserNode>::iterator iter = _channelUserTable.begin();
+    vector<s_ChannelUserNode* >::iterator iter = _channelUserTable.begin();
 
     for (; iter != _channelUserTable.end(); ++iter)
     {
-        if (iter->_pUserPair->first == FD && \
-            iter->_pChannelPair->first == chanName)
+        if ((*iter)->_pUserPair->first == FD && \
+            (*iter)->_pChannelPair->first == chanName)
         {
+            delete (*iter);
             _channelUserTable.erase(iter);
 
             break ;
@@ -298,19 +315,20 @@ void Database::leaveChannel(int& FD, std::string& chanName)
 }
 
 
-eIsUserAtChannel Database::isUserAtChannel(std::string& chanName, \
-                                            std::string& userNick)
+
+
+
+eIsUserAtChannel Database::isUserAtChannel(string& chanName, \
+                                            string& userNick)
 {
-    std::vector<s_ChannelUserNode>::iterator iter = _channelUserTable.begin();
+    vector<s_ChannelUserNode* >::iterator iter = _channelUserTable.begin();
 
     for (; iter != _channelUserTable.end(); ++iter)
     {
-        std::cout << "CHANNAME" << chanName << std::endl;
-        std::cout << "usernick" << userNick << std::endl;
-        if (iter->_pChannelPair->first == chanName && \
-            iter->_pUserPair->second->getNickname() == userNick)
+        if ((*iter)->_pChannelPair->first == chanName && \
+            (*iter)->_pUserPair->second->getNickname() == userNick)
         {
-            if (iter->_bOP)
+            if ((*iter)->_bOP)
             {
                 return (IS_USER_OP);
             }
@@ -323,50 +341,88 @@ eIsUserAtChannel Database::isUserAtChannel(std::string& chanName, \
     return (NO_USER);
 }
 
-User* Database::searchUser(std::string& nickname)
+
+
+
+
+User* Database::searchUser(string& nickname)
 {
     for (size_t i = 0; i < _users.size(); ++i)
     {
-        if (_users[i].second->getNickname() == nickname)
-            return (_users[i].second);
+        if (_users[i]->second->getNickname() == nickname)
+            return (_users[i]->second);
     }
 
     return (NULL);
 }
+
+
+
+
 
 User *Database::searchUser(const int &FD)
 {
     for (size_t i = 0; i < _users.size(); ++i)
     {
-        if (_users[i].first == FD)
-            return (_users[i].second);
+        if (_users[i]->first == FD)
+            return (_users[i]->second);
     }
     
     return (NULL);
 }
 
-Channel* Database::searchChannel(std::string& chanName)
+
+
+
+
+Channel* Database::searchChannel(string& chanName)
 {
     for (size_t i = 0; i < _channels.size(); ++i)
     {
-        if (_channels[i].second->getName() == chanName)
-            return (_channels[i].second);
+        if (_channels[i]->second->getName() == chanName)
+            return (_channels[i]->second);
     }
 
     return (NULL);
 }
 
-std::vector<std::string> Database::getUsersAtChannel(std::string &chanName)
+
+
+
+
+vector<string> Database::getUsersAtChannel(string &chanName)
 {
-    std::vector<std::string> users;
+    vector<string> users;
     for (size_t i = 0; i < _channelUserTable.size(); ++i)
     {
-        if (_channelUserTable[i]._pChannelPair->first == chanName)
+        if (_channelUserTable[i]->_pChannelPair->first == chanName)
         {
-            users.push_back(_channelUserTable[i]._pUserPair->second->getNickname());
+            users.push_back(_channelUserTable[i]->_pUserPair->second->getNickname());
         }
     }
     return users;
+}
+
+
+
+
+
+vector<string> Database::getChannelsWithUser(string userName)
+{
+    const int FIRST_CAPACITY = 5;
+    vector<string> channels;
+
+    channels.reserve(FIRST_CAPACITY);
+
+    for (size_t i = 0; i < _channelUserTable.size(); ++i)
+    {
+        if (_channelUserTable[i]->_pUserPair->second->getNickname() == userName)
+        {
+            channels.push_back(_channelUserTable[i]->_pChannelPair->first);
+        }
+    }
+
+    return (channels);
 }
 
     //PRIVATE:
@@ -375,3 +431,36 @@ std::vector<std::string> Database::getUsersAtChannel(std::string &chanName)
 
 //****************************************************************************/
 //GLOBAL FUNCTION ************************************************************/
+
+
+//TESTCODE
+void Database::printAllChannalPair()
+{
+    cout<<"_channels size: "<<_channels.size()<<endl;
+    for (size_t i = 0; i < _channels.size(); ++i)
+    {
+        cout<<"first: "<<_channels[i]->first<<"    "<<"second: "<<_channels[i]->second->getName()<<endl;
+    }
+    cout<<endl;
+}
+
+void Database::printAllUserPair()
+{
+    cout<<"_users size: "<<_users.size()<<endl;
+    for (size_t i = 0; i < _users.size(); ++i)
+    {
+        cout<<"first: "<<_users[i]->first<<"    "<<"second: "<<_users[i]->second->getNickname()<<endl;
+    }
+    cout<<endl;
+}
+
+void Database::printAllTable()
+{
+    cout<<"table size: "<<_channelUserTable.size()<<endl;
+    for (size_t i = 0; i < _channelUserTable.size(); ++i)
+    {
+        cout<<"user: "<<_channelUserTable[i]->_pUserPair->first<<_channelUserTable[i]->_pUserPair->second->getNickname()<<endl;
+        cout<<"channels: "<<_channelUserTable[i]->_pChannelPair->first<<" "<<_channelUserTable[i]->_pChannelPair->second->getName()<<endl;
+    }
+    cout<<endl;
+}

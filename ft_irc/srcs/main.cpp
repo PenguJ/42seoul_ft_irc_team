@@ -1,10 +1,10 @@
 #include "../includes/Irc.hpp"
 
 bool Server::bRunning = true;
-std::string Server::ServPWD;
-std::string Server::Host = "pythonIRC";
+string Server::ServPWD;
+string Server::Host = "pythonIRC";
 u_int16_t Server::Port = 0;
-std::string Server::PortSTR;
+string Server::PortSTR;
 
 static void HandleSIGINT(int)
 {
@@ -71,19 +71,19 @@ int main(int argc, char* argv[])
 {
     if (argc != 3)
     {
-        std::cerr<<"Usage: ./ircserv <port(decimal)> <password>"<<std::endl;
+        cerr<<"Usage: ./ircserv <port(decimal)> <password>"<<endl;
 
         return (EXIT_FAILURE);
     }
     if (!isValidPortNumber(argv[1]))
     {
-        std::cerr<<"error: port number must be between 0 and 65535!"<<std::endl;
+        cerr<<"error: port number must be between 0 and 65535!"<<endl;
 
         return (EXIT_FAILURE);
     }
     if (!isValidPassword(argv[2]))
     {
-        std::cerr<<"error: password must be at least 3 characters and not more than 15 characters"<<std::endl;
+        cerr<<"error: password must be at least 3 characters and not more than 15 characters"<<endl;
 
         return (EXIT_FAILURE);
     }
@@ -102,10 +102,10 @@ int main(int argc, char* argv[])
     {
         ircserv.execute();
     }
-    catch(const std::exception& e)
+    catch(const exception& e)
     {
-        ircserv.processExitError();
-        std::cerr << e.what() << std::endl;
+        ircserv.exitProcess();
+        cerr << e.what() << endl;
 
         return (EXIT_FAILURE);
     }

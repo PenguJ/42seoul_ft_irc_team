@@ -7,13 +7,13 @@ using namespace std;
 
 typedef struct test
 {
-    std::string str;
+    string str;
     int a;
 }   s_test;
 
-void initPairToVec(int a, int b, std::vector<std::pair<int, int>>* vec)
+void initPairToVec(int a, int b, vector<pair<int, int>>* vec)
 {
-    std::pair<int, int> p;
+    pair<int, int> p;
 
     p.first = a;
     p.second = b;
@@ -23,7 +23,7 @@ void initPairToVec(int a, int b, std::vector<std::pair<int, int>>* vec)
 int main()
 {
 // ㅎ해결 vector ㅇ장애
-    // std::vector<int> vec;
+    // vector<int> vec;
 
     // vec.reserve(50);
 
@@ -31,10 +31,10 @@ int main()
     //     vec.push_back(i);
     
     // for (int i = 0; i < 10; ++i)
-    //     std::cout<<vec[i]<<" ";
-    // std::cout<<std::endl;
+    //     cout<<vec[i]<<" ";
+    // cout<<endl;
 
-    // std::vector<int>::iterator iter = vec.begin();
+    // vector<int>::iterator iter = vec.begin();
 
     // while (1)
     // {
@@ -47,46 +47,46 @@ int main()
     //     }
     //     else
     //     {
-    //         std::cout<<*iter<<" ";
+    //         cout<<*iter<<" ";
     //         ++iter;
     //     }
     // }
-    // std::cout<<std::endl;
-    // std::cout<<std::endl;
+    // cout<<endl;
+    // cout<<endl;
     // return (0);
 
 // pair test
-    // std::vector<std::pair<int, int>> vec;
+    // vector<pair<int, int>> vec;
 
     // initPairToVec(1, 2, &vec);
 
-    // std::cout<<vec[0].first<<std::endl;
-    // std::cout<<vec[0].second<<std::endl;
+    // cout<<vec[0].first<<endl;
+    // cout<<vec[0].second<<endl;
 
 // reverse iter test
-    // std::vector<int> vec;
+    // vector<int> vec;
 
     // for (int i = 0; i < 10; ++i)
     // {
     //     vec.push_back(i);
     // }
     // for (int i = 0; i < 10; ++i)
-    //     std::cout<<vec[i]<<" ";
-    // std::cout<<std::endl;
+    //     cout<<vec[i]<<" ";
+    // cout<<endl;
 
-    // std::vector<int>::reverse_iterator riter = vec.rbegin();
+    // vector<int>::reverse_iterator riter = vec.rbegin();
     // for(; riter != vec.rend(); ++riter)
     // {
-    //     std::cout<<*riter<<" ";
+    //     cout<<*riter<<" ";
     // }
-    // std::cout<<std::endl;
+    // cout<<endl;
 
-    std::map<std::string, int> m;
+    map<string, int> m;
 
     m["A"] = 10;
     m["B"] = 20;
 
-    std::cout<<m["A"]<<std::endl;
+    cout<<m["A"]<<endl;
 
 
 }

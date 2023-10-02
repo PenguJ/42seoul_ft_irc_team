@@ -2,11 +2,14 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
+using namespace std;
+
+
 # include <iostream>
 
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
 //				멤버변수를 public으로 선언할 수 있다.
-//			반드시! 상속 여부를 체크한 뒤 클래스를 작성한다. (std::exception 상속은 제외)
+//			반드시! 상속 여부를 체크한 뒤 클래스를 작성한다. (exception 상속은 제외)
 //			이를 위해 최초 양식에는 주석이 없다.
 // 			상속일 시, 메소드와 변수 모두 'protected:'를 명시적으로 나타낸다.(인터페이스인 경우 예외)
 // 			상속일 시, 소멸자는 가상함수이다.
@@ -30,22 +33,22 @@ typedef struct ChannelMode
     bool        bV; // give/take the ability to speak on a moderated channel
     bool        bK; // set a channel key (password)                 -> ON SUBJECT
     int         userLimit; // by mode 'l'
-    std::string channelkey; // by mode 'k'
+    string channelkey; // by mode 'k'
 }   s_ChannelMode;
 
 class Channel
 {
 public:
     //Constructor overload & OCCF
-    Channel(std::string& name, std::string &topic, s_ChannelMode &mode);
+    Channel(string& name, string &topic, s_ChannelMode &mode);
     ~Channel();
     //Exception
     //Operator overload
     //Getter & Setter
-    const std::string getName() const;
-    void setName(std::string name);
-    const std::string getTopic() const;
-    void setTopic(std::string topic);
+    const string getName() const;
+    void setName(string name);
+    const string getTopic() const;
+    void setTopic(string topic);
     s_ChannelMode getChannelMode() const;
     void setChannelMode(s_ChannelMode& mode);
     //Behavior
@@ -61,8 +64,8 @@ private:
     //Behavior
 
 private:
-    std::string     _name;
-    std::string     _topic;
+    string     _name;
+    string     _topic;
     s_ChannelMode   _mode;
 };
 
