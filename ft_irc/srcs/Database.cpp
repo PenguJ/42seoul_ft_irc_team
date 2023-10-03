@@ -427,7 +427,20 @@ vector<string> Database::getChannelsWithUser(string userName)
 
     //PRIVATE:
 
+//BY geonlee
 
+vector<int> Database::getFdsAtChannel(string chanName)
+{
+    vector<int> fds;
+    for (size_t i = 0; i < _channelUserTable.size(); ++i)
+    {
+        if (_channelUserTable[i]->_pChannelPair->first == chanName)
+        {
+            fds.push_back(_channelUserTable[i]->_pUserPair->second->getFD());
+        }
+    }
+    return fds;
+}
 
 //****************************************************************************/
 //GLOBAL FUNCTION ************************************************************/
@@ -464,3 +477,4 @@ void Database::printAllTable()
     }
     cout<<endl;
 }
+

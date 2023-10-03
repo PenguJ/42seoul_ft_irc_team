@@ -83,6 +83,9 @@ public:
     vector<string>getUsersAtChannel(string &chanName);
     vector<string> getChannelsWithUser(string userName);
 
+    //BY geonlee
+    vector<int> Database::getFdsAtChannel(string chanName);
+
 //TESTCODE
 void printAllChannalPair();
 void printAllUserPair();

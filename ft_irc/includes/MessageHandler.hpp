@@ -156,6 +156,14 @@ public:
     static const string ERR_TOOMANYTARGETS;
     static const string ERR_TOOMANYTARGETS_MSG;
     static const string FORBIDDEN_TO_NICK;
+
+// BY geonlee
+    static const string RPL_INVITING;
+    static const string ERR_UNKNOWNMODE;
+    static const string ERR_UNKNOWNMODE_MSG;
+    static const string ERR_USERONCHANNEL_MSG;
+    static const string ERR_INVALIDMODEPARAM;
+    static const string ERR_INVALIDMODEPARAM_MSG;
 };
 
 //GLOBAL FUNCTION for class MessageHandler{}

@@ -108,6 +108,21 @@ void Channel::setChannelMode(s_ChannelMode& mode)
 }
 
 
+// BY geonlee
+void Channel::setBO(bool value) { _mode.bO = value; }
+void Channel::setBP(bool value) { _mode.bP = value; }
+void Channel::setBS(bool value) { _mode.bS = value; }
+void Channel::setBI(bool value) { _mode.bI = value; }
+void Channel::setBT(bool value) { _mode.bT = value; }
+void Channel::setBN(bool value) { _mode.bN = value; }
+void Channel::setBM(bool value) { _mode.bM = value; }
+void Channel::setBL(bool value) { _mode.bL = value; }
+void Channel::setBB(bool value) { _mode.bB = value; }
+void Channel::setBV(bool value) { _mode.bV = value; }
+void Channel::setBK(bool value) { _mode.bK = value; }
+void Channel::setUserLimit(int value) { _mode.userLimit = value; }
+void Channel::setChannelKey(const std::string& value) { _mode.channelkey = value; }
+
 	//PRIVATE:
 
 	

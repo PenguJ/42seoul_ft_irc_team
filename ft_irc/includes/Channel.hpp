@@ -51,6 +51,23 @@ public:
     void setTopic(string topic);
     s_ChannelMode getChannelMode() const;
     void setChannelMode(s_ChannelMode& mode);
+
+    // BY geonlee
+    void setBO(bool value);
+    void setBP(bool value);
+    void setBS(bool value);
+    void setBI(bool value);
+    void setBT(bool value);
+    void setBN(bool value);
+    void setBM(bool value);
+    void setBL(bool value);
+    void setBB(bool value);
+    void setBV(bool value);
+    void setBK(bool value);
+    void setUserLimit(int value);
+    void setChannelKey(const std::string& value);
+
+
     //Behavior
 
 private:
