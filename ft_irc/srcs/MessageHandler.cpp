@@ -584,7 +584,8 @@ void MessageHandler::MODE(s_Command CMD, User *user)
                     else
                     {
                         msg = COL + Server::Host + SPACE + ERR_UNKNOWNMODE + SPACE + user->getNickname() + SPACE + param_second + ERR_UNKNOWNMODE_MSG + ENDL;
-                        send(_FD, msg.c_str(), msg.size(), 0);                         
+                        send(_FD, msg.c_str(), msg.size(), 0);
+                        return ;                         
                     }
                 }
                 else if (param_second[0] == '+')
@@ -611,7 +612,8 @@ void MessageHandler::MODE(s_Command CMD, User *user)
                             else
                             {
                                 msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
-                                send(_FD, msg.c_str(), msg.size(), 0);                                
+                                send(_FD, msg.c_str(), msg.size(), 0);     
+                                return ;                           
                             }
                         }
                     }
@@ -622,31 +624,31 @@ void MessageHandler::MODE(s_Command CMD, User *user)
                     }
                     else if (param_second[1] == 'l')
                     {
-                        if (channel->getChannelMode().bL == 1)
+                        if (CMD.parameters.size() == 3)
                         {
-                            if (CMD.parameters.size() == 3)
-                            {
-                                channel->setBL(1);
-                                stringstream ss(CMD.parameters[2]);
-                                int num;
-                                ss >> num;
-                                if (!ss.fail()) // 테스트 해봤는데 변환 불가능한 문자열은 0으로 됨
-                                    channel->setUserLimit(0);                                
-                                else
-                                    channel->setUserLimit(num); // atoi, 음수도 그대로 들어가짐(상용기준)
-                            }
+                            channel->setBL(1);
+                            stringstream ss(CMD.parameters[2]);
+                            int num;
+                            ss >> num;
+                            if (!ss.fail()) // 테스트 해봤는데 변환 불가능한 문자열은 0으로 됨
+                                channel->setUserLimit(0);                                
                             else
-                            {
-                                msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + user->getNickname() + \
-                                     SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
-                                send(_FD, msg.c_str(), msg.size(), 0);                                
-                            }
+                                channel->setUserLimit(num); // atoi, 음수도 그대로 들어가짐(상용기준)
                         }
+                        else
+                        {
+                            msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + user->getNickname() + \
+                                    SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
+                            send(_FD, msg.c_str(), msg.size(), 0);
+                            return ;                             
+                        }
+
                     }
                     else
                     {
                         msg = COL + Server::Host + SPACE + ERR_UNKNOWNMODE + SPACE + user->getNickname() + SPACE + param_second + ERR_UNKNOWNMODE_MSG + ENDL;
-                        send(_FD, msg.c_str(), msg.size(), 0);                         
+                        send(_FD, msg.c_str(), msg.size(), 0);     
+                        return ;                   
                     }
                 }
                 msg = COL + usernick + EXCL +  user->getRealname() + SPACE + CMD.command + SPACE + HASH + param_first + \
@@ -921,6 +923,7 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                         }
                         else
                         {
+                            cout  << "channel : " << _pDB->getUsersAtChannel(channel_name).size()  << "/" << CHANNEL->getChannelMode().userLimit << endl;
                             _pDB->joinChannel(FD, channel_name, false);
                             user->setCurrentChannel(channel_name);
                             msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
