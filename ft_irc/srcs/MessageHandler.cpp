@@ -757,29 +757,31 @@ void MessageHandler::KICK(s_Command CMD, User *user)
         send(_FD, msg.c_str(), msg.size(), 0);
         return ;      
     }
-    Channel *channel = _pDB->searchChannel(CMD.parameters[0]);
     User *target = _pDB->searchUser(CMD.parameters[1]);
+    string nickname = user->getNickname();
     string channelname = CMD.parameters[0]; 
-    string nickname = CMD.parameters[1];
+    string target_nickname = CMD.parameters[1];
     if (channelname[0] == '#')
     {
         channelname = channelname.substr(1);
     }  
+    Channel *channel = _pDB->searchChannel(channelname);
     int auth = _pDB->isUserAtChannel(channelname, nickname);
-    int target_auth = _pDB->isUserAtChannel(channelname, CMD.parameters[1]);
+    int target_auth = _pDB->isUserAtChannel(channelname, target_nickname);
+    cout << auth << " is auth num!!!" << endl;
     if (channel == NULL) 
     {
-        msg = COL + Server::Host + SPACE + ERR_NOSUCHCHANNEL + SPACE + user->getNickname() + SPACE + channelname + ERR_NOSUCHCHANNEL_MSG + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_NOSUCHCHANNEL + SPACE + user->getNickname() + SPACE + HASH + channelname + ERR_NOSUCHCHANNEL_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else if (target == NULL)
     {
-        msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + user->getNickname() + SPACE + nickname + ERR_NOSUCHNICK_MSG + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + user->getNickname() + SPACE + target_nickname + ERR_NOSUCHNICK_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else if (auth == 0) 
     {
-        msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + user->getNickname() + SPACE + channelname + ERR_NOTONCHANNEL_MSG + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + user->getNickname() + SPACE + HASH + channelname + ERR_NOTONCHANNEL_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else if (target_auth == 0)
@@ -789,7 +791,7 @@ void MessageHandler::KICK(s_Command CMD, User *user)
     }
     else if (auth == 1) 
     {
-        msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + user->getNickname() + SPACE + channelname + ERR_CHANOPRIVSNEEDED + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + user->getNickname() + SPACE + HASH + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else
@@ -869,8 +871,9 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                     CM.userLimit = -1;
                     CM.channelkey = "";
                     _pDB->createChannelAtDatabase(user, channel_name, topic_tmp, CM);
+                    cout << user->getNickname() << " made " << channel_name << "!!" << endl;
                     user->setCurrentChannel(channel_name);
-                    msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + AST + SPACE + COL + user_real + ENDL;
+                    msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
                     send(_FD, msg.c_str(), msg.size(), 0);  
                 }
                 else // 
@@ -902,11 +905,12 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                                 }
                                 else
                                 {
-                                    _pDB->joinChannel(FD,channel_name);
+                                    _pDB->joinChannel(FD, channel_name, false);
                                     user->setCurrentChannel(channel_name);
-                                    msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + AST + SPACE + COL + user_real + ENDL;
-                                    send(_FD, msg.c_str(), msg.size(), 0);  
-                                    // join -> 353 -> 366 은 /names 이기 때문에 구현 x 
+                                    msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;  
+                                    std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
+                                    for (size_t i = 0; i < fds.size(); ++i) // announce to all
+                                        send(fds[i], msg.c_str(), msg.size(), 0);
                                 }
                             }
                         }
@@ -924,11 +928,12 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                             }
                             else
                             {
-                                _pDB->joinChannel(FD,channel_name);
+                                _pDB->joinChannel(FD, channel_name, false);
                                 user->setCurrentChannel(channel_name);
-                                msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + AST + SPACE + COL + user_real + ENDL;
-                                send(_FD, msg.c_str(), msg.size(), 0);  
-                                // join -> 353 -> 366
+                                msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
+                                std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
+                                for (size_t i = 0; i < fds.size(); ++i) // announce to all
+                                    send(fds[i], msg.c_str(), msg.size(), 0);
                             }
                         }
                     }

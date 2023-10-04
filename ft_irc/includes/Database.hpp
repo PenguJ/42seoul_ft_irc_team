@@ -74,7 +74,7 @@ public:
                                     string topic, \
                                     s_ChannelMode mode); // when some user create a channel
     void clearChannelAtDatabase(string& name); // when last user leave a channel
-    void joinChannel(int FD, string chanName); // when some user join channel already exist
+    void joinChannel(int FD, string chanName, bool is_op); // when some user join channel already exist
     void leaveChannel(int& FD, string& chanName); // when some user leave channel already exist
 
     eIsUserAtChannel isUserAtChannel(string& chanName, string& userNick);

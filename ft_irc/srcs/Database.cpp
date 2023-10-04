@@ -210,7 +210,7 @@ void Database::createChannelAtDatabase(User* pMaker, \
     tmp->first = name;
     tmp->second = new Channel(name, topic, mode);
     _channels.push_back(tmp);
-    joinChannel(pMaker->getFD(), name);
+    joinChannel(pMaker->getFD(), name, true);
 }
 
 
@@ -268,7 +268,7 @@ void Database::clearChannelAtDatabase(string& name)
 
 
 
-void Database::joinChannel(int FD, string chanName)
+void Database::joinChannel(int FD, string chanName, bool is_op)
 {
     s_ChannelUserNode* tmp = new s_ChannelUserNode;
 
@@ -290,6 +290,8 @@ void Database::joinChannel(int FD, string chanName)
             break ;
         }
     }
+    tmp->_bOP = is_op;
+    cout << is_op << " is user op!! " << endl << endl;
     _channelUserTable.push_back(tmp);
 }
 
