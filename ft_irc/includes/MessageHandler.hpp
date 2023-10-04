@@ -36,7 +36,7 @@ class MessageHandler
 {
 public:
     //Constructor overload & OCCF
-    MessageHandler(int FD, string &BUFF, Database * const pDB, vector<pollfd>* pPFDS);
+    MessageHandler(int FD, string BUFF, Database * const pDB, vector<pollfd>* pPFDS);
     ~MessageHandler();
     //Exception
     //Operator overload

@@ -21,6 +21,7 @@ Server::Server()
     const u_int8_t FIRST_SERVER_CAPACITY= 255;
 
     _PFDS.reserve(FIRST_SERVER_CAPACITY);
+    // _MSGs.reserve(FIRST_SERVER_CAPACITY);
 }
 
 Server::~Server()
@@ -136,6 +137,10 @@ void Server::execute()
 }
 {
     _pDB = new Database;
+    // _MSGs.push_back(NULL); 
+    // _MSGs.push_back(NULL); 
+    // _MSGs.push_back(NULL); 
+    // _MSGs.push_back(NULL); 
 }
 {	// Run IRC-server Process
     while (Server::bRunning)
@@ -151,12 +156,6 @@ cout<<"IN SERV_MAIN LOOP"<<endl;
         if (eventFD < 0)
         {
             break ;
-        }
-        else if (eventFD == 0)
-        {
-//TESTCODE
-std::cout<<"assert(eventFD == 0)"<<std::endl;
-exit(1);
         }
 
 std::cout<<"POLLFD size: "<<_PFDS.size()<<std::endl;
@@ -193,6 +192,9 @@ std::cout<<"INTO POOL LOOP"<<std::endl;
                 pollfd clnt = {clntFD, POLLIN, 0};
 
                 _PFDS.push_back(clnt);
+                
+                // MessageHandler* msg = new MessageHandler(clntFD, );
+                // _MSGs.push_back(msg);
                 
                 goto ESCAPE_EVENT_SEARCHING_LOOP;
             }

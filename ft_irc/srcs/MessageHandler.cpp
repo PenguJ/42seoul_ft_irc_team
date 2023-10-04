@@ -99,7 +99,7 @@ const string MessageHandler::ERR_INVALIDMODEPARAM_MSG = " :You must specify a pa
 //			혹은 얕은 복사를 의미한다. 이 경우, 명시적으로 표시한다.
 //			기본생성자를 사용하지 않는 경우, 오버로딩 후 주석을 통해 명시적으로 표시한다.
     //PUBLIC:
-MessageHandler::MessageHandler(int FD, string &BUFF, Database * const pDB, vector<pollfd>* pPFDS)
+MessageHandler::MessageHandler(int FD, string BUFF, Database * const pDB, vector<pollfd>* pPFDS)
     : _FD(FD)
     , _BUFF(BUFF)
     , _pDB(pDB)
@@ -320,14 +320,14 @@ void MessageHandler::multicast(vector<string> NICKs, string STR)
 
 void MessageHandler::CAP(s_Command CMD, User *user)
 {
-            // _FD에 해당하는 유저가 없는지 확인
-            (void)CMD;
-            if (user == NULL)
-            {
-                string tmp = "default";
-                // _FD를 제외하고 기본값만을 가진 user를 만든다.
-                _pDB->addUserAtPairVec(_FD,tmp, tmp, tmp, tmp, 0,0,0,0,0,0);
-            }
+    // _FD에 해당하는 유저가 없는지 확인
+    (void)CMD;
+    if (user == NULL)
+    {
+        string tmp = "default";
+        // _FD를 제외하고 기본값만을 가진 user를 만든다.
+        _pDB->addUserAtPairVec(_FD,tmp, tmp, tmp, tmp, 0,0,0,0,0,0);
+    }
 }
 
 
@@ -522,8 +522,6 @@ void MessageHandler::MODE(s_Command CMD, User *user)
         }
         else if (CMD.parameters.size() < 2)
         {
-            msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
-            send(_FD, msg.c_str(), msg.size(), 0);
             return ;   
         }
         else if (auth == 0) 
@@ -971,7 +969,7 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                 CM.userLimit = -1;
                 CM.channelkey = "";
                 _pDB->createChannelAtDatabase(user, channel_name, topic_tmp, CM);
-                msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL +\
+                msg = COL + user_nick + EXCL + user->getRealname() + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL +\
                     COL + Server::Host + SPACE + RPL_NAMREPLY + SPACE + user_nick + SPACE + AT + SPACE + HASH + channel_name + SPACE + COL + AT + user_nick + ENDL +\
                     COL + Server::Host + SPACE + RPL_ENDOFNAMES + SPACE + user_nick + SPACE + HASH + channel_name + RPL_ENDOFNAMES_MSG + ENDL;
                 send(_FD, msg.c_str(), msg.size(), 0);
@@ -1035,7 +1033,7 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
 
                         cout  << "channel : " << _pDB->getUsersAtChannel(channel_name).size()  << "/" << CHANNEL->getChannelMode().userLimit << endl;
                         _pDB->joinChannel(FD, channel_name, false);
-                        msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
+                        msg = COL + user_nick + EXCL + user->getRealname() + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
                         std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
                         for (size_t i = 0; i < fds.size(); ++i) // announce to all
                         {
@@ -1054,7 +1052,7 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                                 users_msg.append(AT);
                             users_msg.append(userlist[i]);
                         }
-                        msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL +\
+                        msg = COL + user_nick + EXCL + user->getRealname() + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL +\
                         COL + Server::Host + SPACE + RPL_NAMREPLY + SPACE + user_nick + SPACE + AT + SPACE + HASH + channel_name + SPACE + COL + users_msg + ENDL +\
                         COL + Server::Host + SPACE + RPL_ENDOFNAMES + SPACE + user_nick + SPACE + HASH + channel_name + RPL_ENDOFNAMES_MSG + ENDL;
                         send(_FD, msg.c_str(), msg.size(), 0);
