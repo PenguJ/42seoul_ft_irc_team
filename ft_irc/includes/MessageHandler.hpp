@@ -93,9 +93,12 @@ public:
 
 // RPL 
     static const string RPL_WELCOME;
+    static const string RPL_YOURHOST;
     static const string RPL_UMODEIS;
     static const string RPL_NOTOPIC;
     static const string RPL_TOPIC;
+    static const string RPL_CREATED;
+    static const string RPL_MYINFO;
 
 // ERR
     static const string ERR_UNKNOWNERROR;
@@ -159,6 +162,9 @@ public:
 
 // BY geonlee
     static const string RPL_INVITING;
+    static const string RPL_NAMREPLY;
+    static const string RPL_ENDOFNAMES;
+    static const string RPL_ENDOFNAMES_MSG;
     static const string ERR_UNKNOWNMODE;
     static const string ERR_UNKNOWNMODE_MSG;
     static const string ERR_USERONCHANNEL_MSG;

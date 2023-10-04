@@ -9,9 +9,15 @@ const string MessageHandler::HASH = "#";
 const string MessageHandler::EXCL = "!";
 const string MessageHandler::AT = "@";
 const string MessageHandler::RPL_WELCOME = "001";
+const string MessageHandler::RPL_YOURHOST = "002";
+const string MessageHandler::RPL_CREATED = "003";
+const string MessageHandler::RPL_MYINFO = "004";
 const string MessageHandler::RPL_UMODEIS = "221";
 const string MessageHandler::RPL_NOTOPIC = "331";
 const string MessageHandler::RPL_TOPIC = "332";
+const string MessageHandler::RPL_NAMREPLY = "353";
+const string MessageHandler::RPL_ENDOFNAMES = "366";
+const string MessageHandler::RPL_ENDOFNAMES_MSG = " :End of /NAMES list";
 
 const string MessageHandler::ERR_UNKNOWNERROR = "400";
 const string MessageHandler::ERR_NOSUCHNICK = "401";
@@ -47,7 +53,7 @@ const string MessageHandler::ERR_NOTONCHANNEL = "442";
 const string MessageHandler::ERR_NOTONCHANNEL_MSG = " :You're not on that channel";
 const string MessageHandler::ERR_USERONCHANNEL = "443";
 const string MessageHandler::ERR_NOTREGISTERED = "451";
-const string MessageHandler::ERR_NOTREGISTERED_MSG = ":You have not registered";
+const string MessageHandler::ERR_NOTREGISTERED_MSG = " :You have not registered";
 const string MessageHandler::ERR_NEEDMOREPARAMS = "461";
 const string MessageHandler::ERR_NEEDMOREPARAMS_MSG = " :Not enough parameters";
 const string MessageHandler::ERR_ALREADYREGISTERED = "462";
@@ -437,9 +443,17 @@ void MessageHandler::USER(s_Command CMD, User *user)
             if (CMD.suffix.length())
                 user->setRealname(CMD.suffix);
             string welcome = " :Welcome to ft_irc! ";
-            msg = COL + Server::Host + SPACE + RPL_WELCOME + SPACE + user->getNickname() + welcome + tmpUsername + ENDL;
+            string yourhost = " :Your host is pythonIRC, running version 0.0.1";
+            string created = " :This server was created 2023/09";
+            string modeinfo = "0.0.1 i iklot :klo";
+            msg = COL + Server::Host + SPACE + RPL_WELCOME + SPACE + user->getNickname() + welcome + tmpUsername + ENDL +
+                COL + Server::Host + SPACE + RPL_YOURHOST + SPACE + user->getNickname() + yourhost + ENDL +
+                COL + Server::Host + SPACE + RPL_CREATED + SPACE + user->getNickname() + created + ENDL +
+                COL + Server::Host + SPACE + RPL_MYINFO + SPACE + user->getNickname() + Server::Host + SPACE + modeinfo + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0); 
-            cout << welcome << endl;
+        // :chika.luatic.net 003 a :This server was created 23:02:59 Jun 07 2021
+        // :chika.luatic.net 004 a chika.luatic.net InspIRCd-3 HILRSTWcgikorswxz CFILMNRSTbcefgijklmnoprstvxz :FILbefgjklov
+            // :chika.luatic.net 002 a :Your host is *.Luatic.net, running version InspIRCd-3
         }
     }
 }
@@ -957,15 +971,18 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                 CM.userLimit = -1;
                 CM.channelkey = "";
                 _pDB->createChannelAtDatabase(user, channel_name, topic_tmp, CM);
-                cout << user->getNickname() << " made " << channel_name << "!!" << endl;
-                msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
+                msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL +\
+                    COL + Server::Host + SPACE + RPL_NAMREPLY + SPACE + user_nick + SPACE + AT + SPACE + HASH + channel_name + SPACE + COL + AT + user_nick + ENDL +\
+                    COL + Server::Host + SPACE + RPL_ENDOFNAMES + SPACE + user_nick + SPACE + HASH + channel_name + RPL_ENDOFNAMES_MSG + ENDL;
                 send(_FD, msg.c_str(), msg.size(), 0);
                 string tmp1 = "MODE";
                 string tmp2 = "+o";
-                // user!aseprite1 MODE #test -o :admin
                 msg = COL + user_nick + EXCL + user->getRealname() + SPACE + tmp1 + SPACE + HASH + channel_name + \
                         SPACE + tmp2 + SPACE + COL + user_nick + ENDL;
                 send(_FD, msg.c_str(), msg.size(), 0);
+
+                // 첫 유저에게 op부여
+
             }
             else // 채널 있는경우 
             {
@@ -1021,7 +1038,26 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                         msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
                         std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
                         for (size_t i = 0; i < fds.size(); ++i) // announce to all
-                            send(fds[i], msg.c_str(), msg.size(), 0);
+                        {
+                            if (fds[i] != _FD)
+                                send(fds[i], msg.c_str(), msg.size(), 0); // 새로들어오는 녀석 이외 announce;
+                        }
+                        vector<string>userlist = _pDB->getUsersAtChannel(channel_name);
+                        string users_msg;
+                        users_msg.append(user_nick);
+                        for (size_t i = 0; i < userlist.size(); ++i)
+                        {
+                            if (userlist[i] == user_nick)
+                                continue;
+                            users_msg.append(" ");
+                            if (_pDB->isUserAtChannel(channel_name, userlist[i]) == 2)
+                                users_msg.append(AT);
+                            users_msg.append(userlist[i]);
+                        }
+                        msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL +\
+                        COL + Server::Host + SPACE + RPL_NAMREPLY + SPACE + user_nick + SPACE + AT + SPACE + HASH + channel_name + SPACE + COL + users_msg + ENDL +\
+                        COL + Server::Host + SPACE + RPL_ENDOFNAMES + SPACE + user_nick + SPACE + HASH + channel_name + RPL_ENDOFNAMES_MSG + ENDL;
+                        send(_FD, msg.c_str(), msg.size(), 0);
                     }
                 }
             }
@@ -1109,13 +1145,13 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
         else
         {
             channel->setTopic(CMD.suffix);
-            std::cout << CMD.suffix << "is topic!" << std::endl;
-            std::vector<std::string> nicknames = _pDB->getUsersAtChannel(channelname);
-            std::vector<int>fds = _pDB->getFdsAtChannel(channelname);
+            cout << CMD.suffix << "is topic!" << endl;
+            vector<string> nicknames = _pDB->getUsersAtChannel(channelname);
+            vector<int>fds = _pDB->getFdsAtChannel(channelname);
             for (size_t i = 0; i < nicknames.size(); ++i) // announce to all
             {
                 msg = COL + Server::Host + SPACE + RPL_TOPIC + SPACE + nicknames[i] + SPACE + HASH + channelname + SPACE + COL + channel->getTopic() + ENDL;  // tcpflow상으로 설정하고 끝이긴함.
-                std::cout << msg << std::endl;
+                cout << msg << endl;
                 send(fds[i], msg.c_str(), msg.size(), 0);
             }
         }
@@ -1149,7 +1185,7 @@ void MessageHandler::PING(s_Command CMD, User *user)
     else
     {
         string PONG = "PONG";
-        msg = COL + Server::Host + SPACE + PONG + SPACE + Server::Host + CMD.parameters[0] + ENDL;
+        msg = COL + Server::Host + SPACE + PONG + SPACE + Server::Host + SPACE +CMD.parameters[0] + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);   
 
         cout << "PONG SENTED!!" << endl;                   

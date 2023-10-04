@@ -77,6 +77,7 @@ private:
     int                     _servSock;
     vector<pollfd>          _PFDS;
     Database*               _pDB;
+    // vector<MessageHandler*> _MSGs;
 };
 
 //GLOBAL FUNCTION for class Server{}
