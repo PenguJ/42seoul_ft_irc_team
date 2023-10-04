@@ -935,9 +935,14 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                             msg = COL + Server::Host + SPACE + ERR_INVITEONLYCHAN + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_INVITEONLYCHAN_MSG + ENDL;
                             send(_FD, msg.c_str(), msg.size(), 0); 
                         }
+                        else if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을때
+                        {   
+                            msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
+                            send(_FD, msg.c_str(), msg.size(), 0);                                     
+                        }
                         else
                         {
-                            if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을 때
+                            if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) > CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을 때
                             {   
                                 msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
                                 send(_FD, msg.c_str(), msg.size(), 0);                                     
