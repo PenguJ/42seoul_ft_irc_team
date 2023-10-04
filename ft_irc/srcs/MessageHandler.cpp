@@ -628,9 +628,9 @@ void MessageHandler::MODE(s_Command CMD, User *user)
                             int num;
                             ss >> num;
                             if (!ss.fail()) // 테스트 해봤는데 변환 불가능한 문자열은 0으로 됨
-                                channel->setUserLimit(0);                                
-                            else
                                 channel->setUserLimit(num); // atoi, 음수도 그대로 들어가짐(상용기준)
+                            else
+                                channel->setUserLimit(0);                                
                         }
                         else
                         {
@@ -750,6 +750,7 @@ void MessageHandler::INVITE(s_Command CMD, User *user)
             if (fds[i] != _FD) // 보낸사람에게 invite메시지 두번 보내지 않게 해줌
                 send(fds[i], msg.c_str(), msg.size(), 0);  
         }
+        send(target->getFD(), msg.c_str(), msg.size(), 0);  
     }
 }
 
@@ -920,6 +921,7 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                         }
                         else if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을때
                         {   
+                            cout << _pDB->getUsersAtChannel(channel_name).size() << "/" << CHANNEL->getChannelMode().userLimit << endl;
                             msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
                             send(_FD, msg.c_str(), msg.size(), 0);                                     
                         }
