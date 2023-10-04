@@ -21,7 +21,6 @@ using namespace std;
 
 typedef struct ChannelMode
 {
-    bool        bO; // give/take channel operator privileges        -> ON SUBJECT
     bool        bP; // private channel flag
     bool        bS; // secret channel flag
     bool        bI; // invite-only channel flag                     -> ON SUBJECT
@@ -51,6 +50,8 @@ public:
     void setTopic(string topic);
     s_ChannelMode getChannelMode() const;
     void setChannelMode(s_ChannelMode& mode);
+    vector<string> getInvites() const;
+    void setInvites(vector<string> invites);
 
     // BY geonlee
     void setBO(bool value);
@@ -81,9 +82,10 @@ private:
     //Behavior
 
 private:
-    string     _name;
-    string     _topic;
+    string          _name;
+    string          _topic;
     s_ChannelMode   _mode;
+    vector<string>  _invites;
 };
 
 //GLOBAL FUNCTION for class Channel{}

@@ -60,7 +60,6 @@ public:
                             string realname, \
                             string nickname, \
                             string username, \
-                            string PWD, \
                             string host, \
                             bool bI, \
                             bool bS, \
@@ -76,6 +75,7 @@ public:
     void clearChannelAtDatabase(string& name); // when last user leave a channel
     void joinChannel(int FD, string chanName, bool is_op); // when some user join channel already exist
     void leaveChannel(int& FD, string& chanName); // when some user leave channel already exist
+    void changeUserOPAtDatabase(string chanName, string userNick, bool is_op);
 
     eIsUserAtChannel isUserAtChannel(string& chanName, string& userNick);
     User* searchUser(string& nickname);

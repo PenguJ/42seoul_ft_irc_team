@@ -74,7 +74,7 @@ const string MessageHandler::FORBIDDEN_TO_NICK = " !\"#$%&'()*+,-./:;<=>?@[\\]^`
 //BY geonlee
 const string MessageHandler::RPL_INVITING = "341";
 const string MessageHandler::ERR_UNKNOWNMODE = "472";
-const string MessageHandler::ERR_UNKNOWNMODE_MSG = ": is unknown mode char to me";
+const string MessageHandler::ERR_UNKNOWNMODE_MSG = " : is unknown mode char to me";
 const string MessageHandler::ERR_USERONCHANNEL_MSG = " :is already on channel";
 const string MessageHandler::ERR_INVALIDMODEPARAM = "696";
 const string MessageHandler::ERR_INVALIDMODEPARAM_MSG = " :You must specify a parameter for the limit mode.";
@@ -225,20 +225,6 @@ void MessageHandler::run()
     // cout<<"[suffix]: "<<command.suffix<<endl<<endl;
 }
     User *user = _pDB->searchUser(_FD); // 유저가 존재하는지, 유저 정보변경등에 사용
-    bool disconnect = 0; // while문 break되야 하는지 판단하는 플래그
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         if (command.command == "CAP")
         {
@@ -254,17 +240,9 @@ void MessageHandler::run()
             {
                 PING(command, user);
             }
-            // else if (command.command == "NOTICE")
-            // {
-            //     NOTICE(command, user);
-            // }
             else if (command.command == "JOIN")
             {
                 JOIN(command, user);
-            }
-            else if (command.command == "PART")
-            {
-
             }
             else if (command.command == "TOPIC")
             {
@@ -298,17 +276,9 @@ void MessageHandler::run()
             {
                 QUIT(command, user);
             }
-            else if (command.command == "KILL")
-            {
-
-            }
             else
             {
-
-            }
-            if (disconnect == 1)
-            {
-                // 연결 종료 
+                cout<<"assert(command)"<<endl;
             }
         }
     }
@@ -350,7 +320,7 @@ void MessageHandler::CAP(s_Command CMD, User *user)
             {
                 string tmp = "default";
                 // _FD를 제외하고 기본값만을 가진 user를 만든다.
-                _pDB->addUserAtPairVec(_FD,tmp, tmp, tmp, tmp, tmp, 0,0,0,0,0,0);
+                _pDB->addUserAtPairVec(_FD,tmp, tmp, tmp, tmp, 0,0,0,0,0,0);
             }
 }
 
@@ -363,6 +333,8 @@ void MessageHandler::NICK(s_Command CMD, User *user)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);
+        _pDB->clearUserAtDatabase(_FD);
+
         return ;
     }
 
@@ -436,6 +408,8 @@ void MessageHandler::USER(s_Command CMD, User *user)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);
+        _pDB->clearUserAtDatabase(_FD);
+
         return ;
     }
     
@@ -496,7 +470,7 @@ void MessageHandler::PASS(s_Command CMD, User *user)
         bool auth = 1;
         cout<< "good" << endl;
         user->setBoolAuthority(auth);
-    } 
+    }
 }
 
 
@@ -504,7 +478,11 @@ void MessageHandler::PASS(s_Command CMD, User *user)
 void MessageHandler::MODE(s_Command CMD, User *user)
 {
     if (!(user->getBoolAuthority()))
+    {
+        _pDB->clearUserAtDatabase(_FD);
+
         return; 
+    }
 
     string msg;
 
@@ -570,8 +548,43 @@ void MessageHandler::MODE(s_Command CMD, User *user)
                     }
                     else if (param_second[1] == 'o')
                     {
-                        if (channel->getChannelMode().bO == 1)
-                            channel->setBO(0);
+                        if (CMD.parameters.size() == 3)
+                        {
+                            User* target = _pDB->searchUser(CMD.parameters[2]);
+                            if (target == NULL)
+                            {
+                                msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + usernick + SPACE + target->getNickname() + ERR_NOSUCHNICK_MSG + ENDL;
+                                send(_FD, msg.c_str(), msg.size(), 0);
+                                return;
+                            }
+                            else 
+                            {
+                                string  tmp_channame = channel->getName();
+                                string  tmp_targetnick = target->getNickname();
+                                int     tmp_auth = _pDB->isUserAtChannel(tmp_channame, tmp_targetnick);
+                                if (tmp_auth == 0) // 채널에 없을때
+                                {
+                                    msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + tmp_targetnick + SPACE + HASH + tmp_channame + ERR_NOTONCHANNEL_MSG + ENDL;
+                                    send(_FD, msg.c_str(), msg.size(), 0); 
+                                    return ;
+                                }
+                                else if (tmp_auth == 1)
+                                {
+                                    return ;
+                                }
+                                else if (tmp_auth == 2)
+                                {
+                                    _pDB->changeUserOPAtDatabase(tmp_channame, tmp_targetnick, false);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + user->getNickname() + \
+                                    SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
+                            send(_FD, msg.c_str(), msg.size(), 0);
+                            return;
+                        }                        
                     }
                     else if (param_second[1] == 'l')
                     {
@@ -616,8 +629,43 @@ void MessageHandler::MODE(s_Command CMD, User *user)
                     }
                     else if (param_second[1] == 'o')
                     {
-                        if (channel->getChannelMode().bO == 0)
-                            channel->setBO(1);
+                        if (CMD.parameters.size() == 3)
+                        {
+                            User* target = _pDB->searchUser(CMD.parameters[2]);
+                            if (target == NULL)
+                            {
+                                msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + usernick + SPACE + target->getNickname() + ERR_NOSUCHNICK_MSG + ENDL;
+                                send(_FD, msg.c_str(), msg.size(), 0);
+                                return;
+                            }
+                            else 
+                            {
+                                string  tmp_channame = channel->getName();
+                                string  tmp_targetnick = target->getNickname();
+                                int     tmp_auth = _pDB->isUserAtChannel(tmp_channame, tmp_targetnick);
+                                if (tmp_auth == 0) // 채널에 없을때
+                                {
+                                    msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + tmp_targetnick + SPACE + HASH + tmp_channame + ERR_NOTONCHANNEL_MSG + ENDL;
+                                    send(_FD, msg.c_str(), msg.size(), 0); 
+                                    return ;
+                                }
+                                else if (tmp_auth == 1)
+                                {
+                                    _pDB->changeUserOPAtDatabase(tmp_channame, tmp_targetnick, true);
+                                }
+                                else if (tmp_auth == 2)
+                                {
+                                    return ;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + user->getNickname() + \
+                                    SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
+                            send(_FD, msg.c_str(), msg.size(), 0);
+                            return;
+                        }  
                     }
                     else if (param_second[1] == 'l')
                     {
@@ -639,7 +687,6 @@ void MessageHandler::MODE(s_Command CMD, User *user)
                             send(_FD, msg.c_str(), msg.size(), 0);
                             return ;                             
                         }
-
                     }
                     else
                     {
@@ -692,9 +739,10 @@ void MessageHandler::INVITE(s_Command CMD, User *user)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);
+        _pDB->clearUserAtDatabase(_FD);
+
         return ;
     }
-
     if (CMD.parameters.size() < 2) // chan, user 있어야함
     {
         msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
@@ -750,20 +798,40 @@ void MessageHandler::INVITE(s_Command CMD, User *user)
             if (fds[i] != _FD) // 보낸사람에게 invite메시지 두번 보내지 않게 해줌
                 send(fds[i], msg.c_str(), msg.size(), 0);  
         }
+        { //BY jeojeon: add target to Channel::_invites vector with validation checking
+        vector<string> invites = channel->getInvites();
+        bool bAlreadyInvited = false;
+
+        for (size_t i = 0; i < invites.size(); ++i)
+        {
+            if (target_nickname == invites[i])
+            {
+                bAlreadyInvited = true;
+            }
+        }
+        
+        if (bAlreadyInvited == false)
+        {
+            invites.push_back(target_nickname);
+            channel->setInvites(invites);
+        }
+
         send(target->getFD(), msg.c_str(), msg.size(), 0);  
+        }
     }
 }
-
 
 void MessageHandler::KICK(s_Command CMD, User *user)
 {
     string msg;
 
-    // no chan -> no nick -> not on chan -> no op 순서로 확인 , 셀프 킥도 가능
+    // no chan -> no nick -> not on chan -> no op 순서로 확인 , 셀프 킥도 가능 
     if (user->getBoolAuthority() == 0)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);
+        _pDB->clearUserAtDatabase(_FD);
+
         return ;
     }
 
@@ -843,98 +911,117 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
         send(_FD, msg.c_str(), msg.size(), 0);                    
         return ;
     }
-    else
+
+    vector<string>channels = split(CMD.parameters[0],',');
+    vector<string>keylist;
+
+    if (CMD.parameters.size() > 1) // 키 까지 주어졌을경우
     {
-        vector<string>channels = split(CMD.parameters[0],',');
-        vector<string>keylist;
+        keylist = split(CMD.parameters[1],','); // JOIN test1,test2,test3 123 처럼 들어오면 클라이언트에서 123,x,x로 바꿔줘서 들어오기 때문에 두 벡터의 size는 같을것임
+        cout << channels.size() << ":::::::::::::::::::::;" << keylist.size() << endl;
+        while (channels.size() > keylist.size()) // 혹시 모를 index out of range 방지 
+            keylist.push_back("x");
+        cout << channels.size() << "#####################" << keylist.size() << endl;
+        cout << keylist[0] << endl;         
+    }
+    for (size_t i = 0; i < channels.size(); ++i)
+    {
+        int FD = _FD;
+        string channel_name = channels[i];
+        string user_nick = user->getNickname();
+        string user_real = user->getRealname();
+        string msg; 
 
-        if (CMD.parameters.size() > 1) // 키 까지 주어졌을경우
+        if (!channel_name.empty())
         {
-            cout << channels.size() << ":::::::::::::::::::::;" << keylist.size() << endl;
-            vector<string>keylist = split(CMD.parameters[1],','); // JOIN test1,test2,test3 123 처럼 들어오면 클라이언트에서 123,x,x로 바꿔줘서 들어오기 때문에 두 벡터의 size는 같을것임
-            while (channels.size() > keylist.size()) // 혹시 모를 index out of range 방지 
-                keylist.push_back("x");
-            cout << channels.size() << "#####################" << keylist.size() << endl;            
-        }
-        for (size_t i = 0; i < channels.size(); ++i)
-        {
-            int FD = _FD;
-            string channel_name = channels[i];
-            string user_nick = user->getNickname();
-            string user_real = user->getRealname();
-            string msg; 
-            if (!channel_name.empty())
+            if (channels[i][0] == '#') // '#' 제거 
             {
-                if (channels[i][0] == '#') // '#' 제거 
-                {
-                    channel_name = channel_name.substr(1);
-                }
-                Channel *CHANNEL = _pDB->searchChannel(channel_name);
+                channel_name = channel_name.substr(1);
+            }
+            Channel *CHANNEL = _pDB->searchChannel(channel_name);
 
-                if (CHANNEL == NULL) // 채널이 없는 경우 
-                {   
-                    string topic_tmp = ""; // 기본값 "" 라고 명시 되어있음
+            if (CHANNEL == NULL) // 채널이 없는 경우 
+            {   
+                string topic_tmp = ""; // 기본값 "" 라고 명시 되어있음
 
-                    ChannelMode CM;
-                    CM.bO = 0;
-                    CM.bP = 0;
-                    CM.bS = 0;
-                    CM.bI = 0;
-                    CM.bT = 0;
-                    CM.bN = 0;
-                    CM.bM = 0;
-                    CM.bL = 0;
-                    CM.bB = 0;
-                    CM.bK = 0;
-                    CM.userLimit = -1;
-                    CM.channelkey = "";
-                    _pDB->createChannelAtDatabase(user, channel_name, topic_tmp, CM);
-                    cout << user->getNickname() << " made " << channel_name << "!!" << endl;
-                    user->setCurrentChannel(channel_name);
-                    msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
-                    send(_FD, msg.c_str(), msg.size(), 0);  
-                }
-                else // 채널 있는경우 
+                ChannelMode CM;
+                CM.bP = 0;
+                CM.bS = 0;
+                CM.bI = 0;
+                CM.bT = 0;
+                CM.bN = 0;
+                CM.bM = 0;
+                CM.bL = 0;
+                CM.bB = 0;
+                CM.bK = 0;
+                CM.userLimit = -1;
+                CM.channelkey = "";
+                _pDB->createChannelAtDatabase(user, channel_name, topic_tmp, CM);
+                cout << user->getNickname() << " made " << channel_name << "!!" << endl;
+                msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
+                send(_FD, msg.c_str(), msg.size(), 0);
+                string tmp1 = "MODE";
+                string tmp2 = "+o";
+                // user!aseprite1 MODE #test -o :admin
+                msg = COL + user_nick + EXCL + user->getRealname() + SPACE + tmp1 + SPACE + HASH + channel_name + \
+                        SPACE + tmp2 + SPACE + COL + user_nick + ENDL;
+                send(_FD, msg.c_str(), msg.size(), 0);
+            }
+            else // 채널 있는경우 
+            {
+                if (_pDB->isUserAtChannel(channel_name, user_nick) == 0) // 채널 명단에 이미 있는 경우
                 {
-                    if (_pDB->isUserAtChannel(channel_name, user_nick) != 0) // 채널 명단에 이미 있는 경우
+                    { // BY jeojeon: if user was invited, then skip Channel Option validation checking
+                    Channel* chan = _pDB->searchChannel(channel_name);
+                    vector<string> invited = chan->getInvites();
+
+                    for (vector<string>::iterator iter = invited.begin(); iter != invited.end(); ++iter)
                     {
-                        user->setCurrentChannel(channel_name); // tcp 통신없음.. 아마 클라이언트단에서 서버스위칭 해주는거같음 
+                        if ((*iter) == user_nick)
+                        {
+                            invited.erase(iter);
+                            chan->setInvites(invited);
+
+                            goto SKIP_CHAN_OPT_CHECKING;
+                        }
+                    }
+                    }
+                    // cout << CHANNEL->getChannelMode().channelkey << "KKKKKEEEEEEYYY" << endl;
+                    // cout << keylist[i] << "MY KEY" << endl;
+                    if (CHANNEL->getChannelMode().channelkey != "") // 비밀번호가 있는 채널일 경우 (op이 /mode #<channel> +k <key> 했을때)
+                    {   
+                        if (CMD.parameters.size() == 1 || (CMD.parameters.size() > 1 && CHANNEL->getChannelMode().channelkey != keylist[i])) // key 인자가 없거나 있는데 틀렸을경우
+                        {
+                            msg = COL + Server::Host + SPACE + ERR_BADCHANNELKEY + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_BADCHANNELKEY + ENDL;
+                            send(_FD, msg.c_str(), msg.size(), 0);
+                            return ;                        
+                        }
+
+                    }
+                    cout << "NO PROB" << endl;
+                    if (CHANNEL->getChannelMode().bI == 1) // invite only라서 못들어갈때
+                    {
+                        cout << "invitE" << endl;
+                        msg = COL + Server::Host + SPACE + ERR_INVITEONLYCHAN + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_INVITEONLYCHAN_MSG + ENDL;
+                        send(_FD, msg.c_str(), msg.size(), 0); 
+                    }
+                    else if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을때
+                    {   
+                        cout << "invitE" << endl;
+                        cout << _pDB->getUsersAtChannel(channel_name).size() << "/" << CHANNEL->getChannelMode().userLimit << endl;
+                        msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
+                        send(_FD, msg.c_str(), msg.size(), 0);                                     
                     }
                     else
                     {
-                        // cout << CHANNEL->getChannelMode().channelkey << "KKKKKEEEEEEYYY" << endl;
-                        // cout << keylist[i] << "MY KEY" << endl;
-                        if (CHANNEL->getChannelMode().channelkey != "") // 비밀번호가 있는 채널일 경우 (op이 /mode #<channel> +k <key> 했을때)
-                        {   
-                            cout << "GETTIN HERE " << endl;
-                            if (CMD.parameters.size() == 1 || (CMD.parameters.size() > 1 && CHANNEL->getChannelMode().channelkey != keylist[i])) // key 인자가 없거나 있는데 틀렸을경우
-                            {
-                                msg = COL + Server::Host + SPACE + ERR_BADCHANNELKEY + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_BADCHANNELKEY + ENDL;
-                                send(_FD, msg.c_str(), msg.size(), 0);
-                                return ;                        
-                            }
-                        }
-                        if (CHANNEL->getChannelMode().bI == 1) // invite only라서 못들어갈때
-                        {
-                            msg = COL + Server::Host + SPACE + ERR_INVITEONLYCHAN + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_INVITEONLYCHAN_MSG + ENDL;
-                            send(_FD, msg.c_str(), msg.size(), 0); 
-                        }
-                        else if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을때
-                        {   
-                            cout << _pDB->getUsersAtChannel(channel_name).size() << "/" << CHANNEL->getChannelMode().userLimit << endl;
-                            msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
-                            send(_FD, msg.c_str(), msg.size(), 0);                                     
-                        }
-                        else
-                        {
-                            cout  << "channel : " << _pDB->getUsersAtChannel(channel_name).size()  << "/" << CHANNEL->getChannelMode().userLimit << endl;
-                            _pDB->joinChannel(FD, channel_name, false);
-                            user->setCurrentChannel(channel_name);
-                            msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
-                            std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
-                            for (size_t i = 0; i < fds.size(); ++i) // announce to all
-                                send(fds[i], msg.c_str(), msg.size(), 0);
-                        }
+                        SKIP_CHAN_OPT_CHECKING:
+
+                        cout  << "channel : " << _pDB->getUsersAtChannel(channel_name).size()  << "/" << CHANNEL->getChannelMode().userLimit << endl;
+                        _pDB->joinChannel(FD, channel_name, false);
+                        msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
+                        std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
+                        for (size_t i = 0; i < fds.size(); ++i) // announce to all
+                            send(fds[i], msg.c_str(), msg.size(), 0);
                     }
                 }
             }
@@ -950,6 +1037,8 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);
+        _pDB->clearUserAtDatabase(_FD);
+
         return ;
     }
 
@@ -989,7 +1078,7 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
     }
     else if (CMD.parameters.size() == 1  && CMD.suffix.empty()) // channel의 topic 조회
     {
-        if (channel->getChannelMode().bT && auth == 1) // 채널 mode +t이면서 권한 없을 시 
+        if (!(channel->getChannelMode().bT) && auth == 1) // 채널 mode +t이면서 권한 없을 시 
         {
             msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + HASH + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);  
@@ -1012,7 +1101,7 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
     else if (CMD.parameters.size() == 1 && !(CMD.suffix.empty())) // channel의 topic 변경
     {
         std::cout << "HERE" << std::endl;
-        if (channel->getChannelMode().bT && auth == 1) // 채널 mode +t이면서 권한 없을 시 
+        if (!(channel->getChannelMode().bT) && auth == 1) // 채널 mode +t이면서 권한 없을 시 
         {
             msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + HASH + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);  
@@ -1042,6 +1131,8 @@ void MessageHandler::PING(s_Command CMD, User *user)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);
+        _pDB->clearUserAtDatabase(_FD);
+
         return ;
     }
 
@@ -1078,6 +1169,7 @@ void MessageHandler::PRIVMSG(s_Command CMD, User* user)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);
+        _pDB->clearUserAtDatabase(_FD);
 
         return ;
     }
@@ -1199,6 +1291,7 @@ void MessageHandler::QUIT(s_Command CMD, User* user)
     {
         msg = COL + Server::Host + SPACE + ERR_NOTREGISTERED + SPACE + AST + SPACE + CMD.command + ERR_NOTREGISTERED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0);
+        _pDB->clearUserAtDatabase(_FD);
 
         return ;
     }

@@ -126,7 +126,6 @@ void Database::addUserAtPairVec(int FD,
                                 string realname, \
                                 string nickname, \
                                 string username, \
-                                string PWD, \
                                 string host, \
                                 bool bI, \
                                 bool bS, \
@@ -138,7 +137,7 @@ void Database::addUserAtPairVec(int FD,
     UserPair* tmp = new UserPair;
 
     tmp->first = FD;
-    tmp->second = new User(FD, realname, nickname, username, PWD, host, bI, bS, bW, bO, bAUTH, bPWD);
+    tmp->second = new User(FD, realname, nickname, username, host, bI, bS, bW, bO, bAUTH, bPWD);
 
     _users.push_back(tmp);
 }
@@ -186,6 +185,30 @@ void Database::clearUserAtDatabase(int FD)
             delete (*iter)->second;
             delete (*iter);
             _users.erase(iter);
+
+            break ;
+        }
+        else
+        {
+            ++iter;
+        }
+    }
+}
+{ // if Channel is not needed, then remove chanPair in _channels
+    ChannelPairVector::iterator iter = _channels.begin();
+
+    while (true)
+    {
+        if (iter == _channels.end())
+        {
+            break ;
+        }
+        else if (getUsersAtChannel((*iter)->first).size() == 0)
+        {
+            delete (*iter)->second;
+            delete (*iter);
+            _channels.erase(iter);
+
             break ;
         }
         else
@@ -442,6 +465,21 @@ vector<int> Database::getFdsAtChannel(string chanName)
         }
     }
     return fds;
+}
+
+void Database::changeUserOPAtDatabase(string chanName, string userNick, bool is_op)
+{
+    vector<s_ChannelUserNode* >::iterator iter = _channelUserTable.begin();
+
+    for (; iter != _channelUserTable.end(); ++iter)
+    {
+        if ((*iter)->_pChannelPair->first == chanName && \
+            (*iter)->_pUserPair->second->getNickname() == userNick)
+        {
+            (*iter)->_bOP = is_op;
+        }
+    }
+    return ;
 }
 
 //****************************************************************************/

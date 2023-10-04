@@ -18,7 +18,11 @@ Channel::Channel(string& name, string &topic, s_ChannelMode &mode)
     : _name(name)
     , _topic(topic)
     , _mode(mode)
-{   }
+{
+	const int FIRST_CAPACITY = 10;
+
+	_invites.reserve(FIRST_CAPACITY);
+}
 
 Channel::~Channel()
 {	}
@@ -107,9 +111,18 @@ void Channel::setChannelMode(s_ChannelMode& mode)
     _mode = mode;
 }
 
+vector<string> Channel::getInvites() const
+{
+	return (_invites);
+}
+
+void Channel::setInvites(vector<string> invites)
+{
+	_invites = invites;
+}
+
 
 // BY geonlee
-void Channel::setBO(bool value) { _mode.bO = value; }
 void Channel::setBP(bool value) { _mode.bP = value; }
 void Channel::setBS(bool value) { _mode.bS = value; }
 void Channel::setBI(bool value) { _mode.bI = value; }

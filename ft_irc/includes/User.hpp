@@ -32,7 +32,7 @@ class User
 public:
     //Constructor overload & OCCF
     User(int FD, string realname, string nickname, string username, \
-        string PWD, string host, \
+        string host, \
         bool bI, bool bS, bool bW, bool bO, \
         bool bAUTH, bool bPWD);
     ~User();
@@ -47,8 +47,6 @@ public:
     void setNickname(string& nickname);
     const string getUsername() const;
     void setUsername(string& username);
-    const string getCurrentChannel() const;
-    void setCurrentChannel(string& channel);
     const string getHost() const;
     void setHost(string& host);
     s_UserMode getUserMode() const;
@@ -74,7 +72,6 @@ private:
     string      _realname;
     string      _nickname;
     string      _username;
-    string      _currentchannel;
     string      _host;
     s_UserMode  _mode;
     bool        _bAUTH;
