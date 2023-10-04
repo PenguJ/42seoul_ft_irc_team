@@ -2,7 +2,6 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-using namespace std;
 // C header
 # include <arpa/inet.h>
 # include <fcntl.h>
@@ -19,6 +18,8 @@ using namespace std;
 # include <vector>
 # include "Database.hpp"
 # include "MessageHandler.hpp"
+
+using namespace std;
 
 typedef struct sockaddr SOCKADDR;
 typedef struct sockaddr_in SOCKADDR_IN;

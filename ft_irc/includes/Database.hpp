@@ -2,13 +2,14 @@
 #ifndef DATABASE_HPP
 # define DATABASE_HPP
 
-using namespace std;
 
 # include <unistd.h>
 # include <iostream>
 # include <vector>
 # include "Channel.hpp"
 # include "User.hpp"
+
+using namespace std;
 
 typedef pair<int, User*>            UserPair;
 typedef pair<string, Channel*>      ChannelPair;
@@ -84,7 +85,7 @@ public:
     vector<string> getChannelsWithUser(string userName);
 
     //BY geonlee
-    vector<int> Database::getFdsAtChannel(string chanName);
+    vector<int> getFdsAtChannel(string chanName);
 
 //TESTCODE
 void printAllChannalPair();

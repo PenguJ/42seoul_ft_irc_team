@@ -2,11 +2,11 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-using namespace std;
 
 
 # include <iostream>
 
+using namespace std;
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
 //				멤버변수를 public으로 선언할 수 있다.
 //			반드시! 상속 여부를 체크한 뒤 클래스를 작성한다. (exception 상속은 제외)
