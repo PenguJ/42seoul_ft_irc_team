@@ -602,19 +602,16 @@ void MessageHandler::MODE(s_Command CMD, User *user)
                     }
                     else if (param_second[1] == 'k')
                     {
-                        if (channel->getChannelMode().bK == 0)
+                        if (CMD.parameters.size() == 3)
                         {
-                            if (CMD.parameters.size() == 3)
-                            {
-                                channel->setBK(1);                        
-                                channel->setChannelKey(CMD.parameters[3]);
-                            }
-                            else
-                            {
-                                msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
-                                send(_FD, msg.c_str(), msg.size(), 0);     
-                                return ;                           
-                            }
+                            channel->setBK(1);                        
+                            channel->setChannelKey(CMD.parameters[2]);
+                        }
+                        else
+                        {
+                            msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+                            send(_FD, msg.c_str(), msg.size(), 0);     
+                            return ;                           
                         }
                     }
                     else if (param_second[1] == 'o')
@@ -852,9 +849,11 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
 
         if (CMD.parameters.size() > 1) // 키 까지 주어졌을경우
         {
+            cout << channels.size() << ":::::::::::::::::::::;" << keylist.size() << endl;
             vector<string>keylist = split(CMD.parameters[1],','); // JOIN test1,test2,test3 123 처럼 들어오면 클라이언트에서 123,x,x로 바꿔줘서 들어오기 때문에 두 벡터의 size는 같을것임
             while (channels.size() > keylist.size()) // 혹시 모를 index out of range 방지 
                 keylist.push_back("x");
+            cout << channels.size() << "#####################" << keylist.size() << endl;            
         }
         for (size_t i = 0; i < channels.size(); ++i)
         {
@@ -902,8 +901,11 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                     }
                     else
                     {
+                        // cout << CHANNEL->getChannelMode().channelkey << "KKKKKEEEEEEYYY" << endl;
+                        // cout << keylist[i] << "MY KEY" << endl;
                         if (CHANNEL->getChannelMode().channelkey != "") // 비밀번호가 있는 채널일 경우 (op이 /mode #<channel> +k <key> 했을때)
                         {   
+                            cout << "GETTIN HERE " << endl;
                             if (CMD.parameters.size() == 1 || (CMD.parameters.size() > 1 && CHANNEL->getChannelMode().channelkey != keylist[i])) // key 인자가 없거나 있는데 틀렸을경우
                             {
                                 msg = COL + Server::Host + SPACE + ERR_BADCHANNELKEY + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_BADCHANNELKEY + ENDL;
