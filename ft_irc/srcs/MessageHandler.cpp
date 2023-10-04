@@ -905,32 +905,11 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                             if (CMD.parameters.size() == 1 || (CMD.parameters.size() > 1 && CHANNEL->getChannelMode().channelkey != keylist[i])) // key 인자가 없거나 있는데 틀렸을경우
                             {
                                 msg = COL + Server::Host + SPACE + ERR_BADCHANNELKEY + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_BADCHANNELKEY + ENDL;
-                                send(_FD, msg.c_str(), msg.size(), 0);                         
-                            }
-                            if ((CMD.parameters.size() > 1 && CHANNEL->getChannelMode().channelkey == keylist[i])) // key를 맞췄을 경우
-                            {
-                                if (CHANNEL->getChannelMode().bI == 1) // 비밀번호 맞는데 invite only 일경우 
-                                {
-                                    msg = COL + Server::Host + SPACE + ERR_INVITEONLYCHAN + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_INVITEONLYCHAN_MSG + ENDL;
-                                    send(_FD, msg.c_str(), msg.size(), 0); 
-                                }
-                                else if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을때
-                                {   
-                                    msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
-                                    send(_FD, msg.c_str(), msg.size(), 0);                                     
-                                }
-                                else
-                                {
-                                    _pDB->joinChannel(FD, channel_name, false);
-                                    user->setCurrentChannel(channel_name);
-                                    msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;  
-                                    std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
-                                    for (size_t i = 0; i < fds.size(); ++i) // announce to all
-                                        send(fds[i], msg.c_str(), msg.size(), 0);
-                                }
+                                send(_FD, msg.c_str(), msg.size(), 0);
+                                return ;                        
                             }
                         }
-                        else if (CHANNEL->getChannelMode().bI == 1) // invite only라서 못들어갈때
+                        if (CHANNEL->getChannelMode().bI == 1) // invite only라서 못들어갈때
                         {
                             msg = COL + Server::Host + SPACE + ERR_INVITEONLYCHAN + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_INVITEONLYCHAN_MSG + ENDL;
                             send(_FD, msg.c_str(), msg.size(), 0); 
