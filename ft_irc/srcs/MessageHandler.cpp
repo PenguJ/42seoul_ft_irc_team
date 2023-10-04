@@ -892,7 +892,7 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                     msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
                     send(_FD, msg.c_str(), msg.size(), 0);  
                 }
-                else // 
+                else // 채널 있는경우 
                 {
                     if (_pDB->isUserAtChannel(channel_name, user_nick) != 0) // 채널 명단에 이미 있는 경우
                     {
@@ -942,20 +942,12 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                         }
                         else
                         {
-                            if (CHANNEL->getChannelMode().userLimit != -1 && static_cast<int>(_pDB->getUsersAtChannel(channel_name).size()) >= CHANNEL->getChannelMode().userLimit) // 유저 리밋이 걸려있을경우 자리가 없을 때
-                            {   
-                                msg = COL + Server::Host + SPACE + ERR_CHANNELISFULL + SPACE + user_nick + SPACE + HASH + channel_name + SPACE + ERR_CHANNELISFULL_MSG + ENDL;
-                                send(_FD, msg.c_str(), msg.size(), 0);                                     
-                            }
-                            else
-                            {
-                                _pDB->joinChannel(FD, channel_name, false);
-                                user->setCurrentChannel(channel_name);
-                                msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
-                                std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
-                                for (size_t i = 0; i < fds.size(); ++i) // announce to all
-                                    send(fds[i], msg.c_str(), msg.size(), 0);
-                            }
+                            _pDB->joinChannel(FD, channel_name, false);
+                            user->setCurrentChannel(channel_name);
+                            msg = COL + user_nick + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
+                            std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
+                            for (size_t i = 0; i < fds.size(); ++i) // announce to all
+                                send(fds[i], msg.c_str(), msg.size(), 0);
                         }
                     }
                 }
