@@ -649,6 +649,14 @@ void MessageHandler::MODE(s_Command CMD, User *user)
                         send(_FD, msg.c_str(), msg.size(), 0);                         
                     }
                 }
+                msg = COL + usernick + EXCL +  user->getRealname() + SPACE + CMD.command + SPACE + HASH + param_first + \
+                        SPACE + param_second + SPACE + COL;
+                if (CMD.parameters.size() == 3)
+                    msg.append(CMD.parameters[2]);
+                msg.append(ENDL);
+                std::vector<int>fds = _pDB->getFdsAtChannel(param_first);
+                for (size_t i = 0; i < fds.size(); ++i) // announce to all
+                    send(fds[i], msg.c_str(), msg.size(), 0);              
             }
             else
             {
@@ -694,47 +702,55 @@ void MessageHandler::INVITE(s_Command CMD, User *user)
         send(_FD, msg.c_str(), msg.size(), 0);
         return ;      
     }
-    Channel *channel = _pDB->searchChannel(CMD.parameters[0]);
-    User *target = _pDB->searchUser(CMD.parameters[1]);
-    string channelname = CMD.parameters[0]; 
-    string nickname = CMD.parameters[1];
+    User *target = _pDB->searchUser(CMD.parameters[0]);
+    string channelname = CMD.parameters[1]; 
+    string target_nickname = CMD.parameters[0];
+    string nickname = user->getNickname();
     if (channelname[0] == '#')
-    {
         channelname = channelname.substr(1);
-    }  
+
+    Channel *channel = _pDB->searchChannel(channelname);
+
     int auth = _pDB->isUserAtChannel(channelname, nickname);
-    int target_auth = _pDB->isUserAtChannel(channelname, CMD.parameters[1]);
+    int target_auth = _pDB->isUserAtChannel(channelname, target_nickname);
     if (channel == NULL) 
     {
-        msg = COL + Server::Host + SPACE + ERR_NOSUCHCHANNEL + SPACE + user->getNickname() + SPACE + channelname + ERR_NOSUCHCHANNEL_MSG + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_NOSUCHCHANNEL + SPACE + nickname + SPACE + channelname + ERR_NOSUCHCHANNEL_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else if (target == NULL)
     {
-        msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + user->getNickname() + SPACE + nickname + ERR_NOSUCHNICK_MSG + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + nickname + SPACE + target_nickname + ERR_NOSUCHNICK_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else if (auth == 0) 
     {
-        msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + user->getNickname() + SPACE + HASH + channelname + ERR_NOTONCHANNEL_MSG + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + nickname + SPACE + HASH + channelname + ERR_NOTONCHANNEL_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
-    else if (target_auth == 0)
+    else if (target_auth != 0)
     {
-        msg = COL + Server::Host + SPACE + ERR_USERONCHANNEL + SPACE + user->getNickname() + SPACE + target->getNickname() + SPACE + HASH + channelname + ERR_USERONCHANNEL_MSG + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_USERONCHANNEL + SPACE + nickname + SPACE + target_nickname + SPACE + HASH + channelname + ERR_USERONCHANNEL_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else if (auth == 1) 
     {
-        msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + user->getNickname() + SPACE + channelname + ERR_CHANOPRIVSNEEDED + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + nickname + SPACE + channelname + ERR_CHANOPRIVSNEEDED + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else
     {   
-        msg = COL + Server::Host + SPACE + RPL_INVITING + SPACE + user->getNickname() + SPACE + target->getNickname()
-        + SPACE + COL + HASH + channelname + ENDL + COL + user->getNickname()+ EXCL + user->getRealname() + SPACE + CMD.command + SPACE\
-        + target->getNickname() + SPACE + COL + HASH + channelname + ENDL;
-        send(target->getFD(), msg.c_str(), msg.size(), 0);
+        msg = COL + Server::Host + SPACE + RPL_INVITING + SPACE + nickname + SPACE + target_nickname
+        + SPACE + COL + HASH + channelname + ENDL + COL + nickname + EXCL + user->getRealname() + SPACE + CMD.command + SPACE\
+        + target_nickname + SPACE + COL + HASH + channelname + ENDL;
+        send(_FD, msg.c_str(), msg.size(), 0);
+        msg = COL + nickname + EXCL + user->getRealname() + SPACE + CMD.command + SPACE + target_nickname + SPACE + COL + HASH + channelname + ENDL;
+        std::vector<int>fds = _pDB->getFdsAtChannel(channelname);
+        for (size_t i = 0; i < fds.size(); ++i) // announce to all
+        {
+            if (fds[i] != _FD) // 보낸사람에게 invite메시지 두번 보내지 않게 해줌
+                send(fds[i], msg.c_str(), msg.size(), 0);  
+        }
     }
 }
 
@@ -979,12 +995,12 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
 
     if (channel == NULL) //채널이 없을경우
     {
-        msg = COL + Server::Host + SPACE + ERR_NOSUCHCHANNEL + SPACE + channelname + ERR_NOSUCHCHANNEL_MSG + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_NOSUCHCHANNEL + SPACE + HASH + channelname + ERR_NOSUCHCHANNEL_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else if (auth == 0) // 자신이 속한 채널이 아닌데 조회하려고 할 경우
     {
-        msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + channelname + ERR_NOTONCHANNEL_MSG + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + HASH + channelname + ERR_NOTONCHANNEL_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
         std::cout << "no auth?" << std::endl;
     }
@@ -992,7 +1008,7 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
     {
         if (channel->getChannelMode().bT && auth == 1) // 채널 mode +t이면서 권한 없을 시 
         {
-            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
+            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + HASH + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);  
         }
         else 
@@ -1000,12 +1016,12 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
             if (channel->getTopic() == "") // 토픽이 없을경우
             {   
                 std::string RPL_TOPIC_MSG = " :No topic is set";
-                msg = COL + Server::Host + SPACE + RPL_NOTOPIC + SPACE + nickname + SPACE + channelname + RPL_TOPIC_MSG + ENDL;
+                msg = COL + Server::Host + SPACE + RPL_NOTOPIC + SPACE + nickname + SPACE + HASH + channelname + RPL_TOPIC_MSG + ENDL;
                 send(_FD, msg.c_str(), msg.size(), 0);  
             }
             else // 토픽이 있을경우
             {
-                msg = COL + Server::Host + SPACE + RPL_TOPIC + SPACE + nickname + SPACE + channelname + SPACE + COL + channel->getTopic() + ENDL; 
+                msg = COL + Server::Host + SPACE + RPL_TOPIC + SPACE + nickname + SPACE + HASH + channelname + SPACE + COL + channel->getTopic() + ENDL; 
                 send(_FD, msg.c_str(), msg.size(), 0);  
             }
         }
@@ -1015,7 +1031,7 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
         std::cout << "HERE" << std::endl;
         if (channel->getChannelMode().bT && auth == 1) // 채널 mode +t이면서 권한 없을 시 
         {
-            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
+            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + HASH + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);  
         }
         else
@@ -1026,7 +1042,7 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
             std::vector<int>fds = _pDB->getFdsAtChannel(channelname);
             for (size_t i = 0; i < nicknames.size(); ++i) // announce to all
             {
-                msg = COL + Server::Host + SPACE + RPL_TOPIC + SPACE + nicknames[i] + SPACE + channelname + SPACE + COL + channel->getTopic() + ENDL;  // tcpflow상으로 설정하고 끝이긴함.
+                msg = COL + Server::Host + SPACE + RPL_TOPIC + SPACE + nicknames[i] + SPACE + HASH + channelname + SPACE + COL + channel->getTopic() + ENDL;  // tcpflow상으로 설정하고 끝이긴함.
                 std::cout << msg << std::endl;
                 send(fds[i], msg.c_str(), msg.size(), 0);
             }
