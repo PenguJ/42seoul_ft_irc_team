@@ -21,6 +21,8 @@ const string MessageHandler::RPL_CREATED_MSG = " :This server was created 2023/0
 const string MessageHandler::RPL_MYINFO = "004";
 const string MessageHandler::RPL_MYINFO_MSG = "0.0.1 i iklot :klo";
 const string MessageHandler::RPL_UMODEIS = "221";
+const string MessageHandler::RPL_CHANNELMODEIS = "324";
+const string MessageHandler::RPL_CREATIONTIME = "329";
 const string MessageHandler::RPL_NOTOPIC = "331";
 const string MessageHandler::RPL_NOTOPIC_MSG = " :No topic is set";
 const string MessageHandler::RPL_TOPIC = "332";
@@ -509,217 +511,235 @@ void MessageHandler::MODE(s_Command CMD, User *user)
     string param_first = CMD.parameters[0];
     if (param_first[0] == '#') //channel
     {
-        string param_second = CMD.parameters[1];
+
+// 013.124.230.197.06667-010.018.231.069.56438: @time=2023-10-05T18:12:08.327Z :chika.luatic.net 324 asd #123 :+nst
+// @time=2023-10-05T18:12:08.327Z :chika.luatic.net 329 asd #123 :1696529525
         param_first = param_first.substr(1);
-        Channel *channel = _pDB->searchChannel(param_first);
         string usernick = user->getNickname();
-        int auth = _pDB->isUserAtChannel(param_first, usernick);
+        Channel *channel = _pDB->searchChannel(param_first);
+        
         if (channel == NULL) 
         {
-            msg = COL + Server::Host + SPACE + ERR_NOSUCHCHANNEL + SPACE + user->getNickname() + SPACE + param_first + ERR_NOSUCHCHANNEL_MSG + ENDL;
+            msg = COL + Server::Host + SPACE + ERR_NOSUCHCHANNEL + SPACE + usernick + SPACE + param_first + ERR_NOSUCHCHANNEL_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0); 
+            return ;
         }
-        else if (CMD.parameters.size() < 2)
-        {
-            return ;   
+        int auth = _pDB->isUserAtChannel(param_first, usernick);
+
+        if (CMD.parameters.size() == 1)
+        {   
+            if (auth != 0)
+            {
+                string modestring = "+";
+                if (channel->getChannelMode().bI)
+                    modestring.append("i");
+                if (channel->getChannelMode().bK)
+                    modestring.append("k");
+                if (channel->getChannelMode().bL)
+                    modestring.append("l");
+                modestring.append("s");
+                if (channel->getChannelMode().bT)
+                    modestring.append("t");
+                msg = COL + Server::Host + SPACE + RPL_CHANNELMODEIS + SPACE + usernick + SPACE + HASH + channel->getName() + SPACE + COL + modestring + ENDL;
+                send(_FD, msg.c_str(), msg.size(), 0);
+            }
+            return;
         }
-        else if (auth == 0) 
+
+        string param_second = CMD.parameters[1];
+        if (auth == 0) 
         {
-            msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + user->getNickname() + SPACE + param_first + ERR_NOTONCHANNEL_MSG + ENDL;
+            msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + usernick + SPACE + param_first + ERR_NOTONCHANNEL_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0); 
         }
         else if (auth == 1)
         {
-            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + user->getNickname() + SPACE + HASH + param_first + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
+            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + usernick + SPACE + HASH + param_first + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);             
+        }
+        else if (param_second.size() != 2 || (param_second[0] != '-' && param_second[0] != '+')) // +ij, *i 이런식으로 들어올 때  
+        {
+            msg = COL + Server::Host + SPACE + ERR_UNKNOWNMODE + SPACE + usernick + SPACE + param_second + ERR_UNKNOWNMODE_MSG + ENDL;
+            send(_FD, msg.c_str(), msg.size(), 0);
         }
         else
         {
-            if (param_second.size() == 2)
+            if (param_second[0] == '-')
             {
-                if (param_second[0] == '-')
+                if (param_second[1] == 'i')
                 {
-                    if (param_second[1] == 'i')
+                    if (channel->getChannelMode().bI == 1)
+                        channel->setBI(0);
+                }
+                else if (param_second[1] == 't')
+                {
+                    if (channel->getChannelMode().bT == 1)
+                        channel->setBT(0); 
+                }
+                else if (param_second[1] == 'k')
+                {
+                    if (channel->getChannelMode().bK == 1)
                     {
-                        if (channel->getChannelMode().bI == 1)
-                            channel->setBI(0);
+                        channel->setBK(0);                        
+                        channel->setChannelKey("");
                     }
-                    else if (param_second[1] == 't')
+                }
+                else if (param_second[1] == 'o')
+                {
+                    if (CMD.parameters.size() == 3)
                     {
-                        if (channel->getChannelMode().bT == 1)
-                            channel->setBT(0); 
-                    }
-                    else if (param_second[1] == 'k')
-                    {
-                        if (channel->getChannelMode().bK == 1)
+                        User* target = _pDB->searchUser(CMD.parameters[2]);
+                        if (target == NULL)
                         {
-                            channel->setBK(0);                        
-                            channel->setChannelKey("");
-                        }
-                    }
-                    else if (param_second[1] == 'o')
-                    {
-                        if (CMD.parameters.size() == 3)
-                        {
-                            User* target = _pDB->searchUser(CMD.parameters[2]);
-                            if (target == NULL)
-                            {
-                                msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + usernick + SPACE + target->getNickname() + ERR_NOSUCHNICK_MSG + ENDL;
-                                send(_FD, msg.c_str(), msg.size(), 0);
-                                return;
-                            }
-                            else 
-                            {
-                                string  tmp_channame = channel->getName();
-                                string  tmp_targetnick = target->getNickname();
-                                int     tmp_auth = _pDB->isUserAtChannel(tmp_channame, tmp_targetnick);
-                                if (tmp_auth == 0) // 채널에 없을때
-                                {
-                                    msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + tmp_targetnick + SPACE + HASH + tmp_channame + ERR_NOTONCHANNEL_MSG + ENDL;
-                                    send(_FD, msg.c_str(), msg.size(), 0); 
-                                    return ;
-                                }
-                                else if (tmp_auth == 1)
-                                {
-                                    return ;
-                                }
-                                else if (tmp_auth == 2)
-                                {
-                                    _pDB->changeUserOPAtDatabase(tmp_channame, tmp_targetnick, false);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + user->getNickname() + \
-                                    SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
+                            msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + usernick + SPACE + target->getNickname() + ERR_NOSUCHNICK_MSG + ENDL;
                             send(_FD, msg.c_str(), msg.size(), 0);
                             return;
-                        }                        
-                    }
-                    else if (param_second[1] == 'l')
-                    {
-                        if (channel->getChannelMode().bL == 1)
+                        }
+                        else 
                         {
-                            channel->setBL(0);
-                            channel->setUserLimit(-1);
+                            string  tmp_channame = channel->getName();
+                            string  tmp_targetnick = target->getNickname();
+                            int     tmp_auth = _pDB->isUserAtChannel(tmp_channame, tmp_targetnick);
+                            if (tmp_auth == 0) // 채널에 없을때
+                            {
+                                msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + tmp_targetnick + SPACE + HASH + tmp_channame + ERR_NOTONCHANNEL_MSG + ENDL;
+                                send(_FD, msg.c_str(), msg.size(), 0); 
+                                return ;
+                            }
+                            else if (tmp_auth == 1)
+                            {
+                                return ;
+                            }
+                            else if (tmp_auth == 2)
+                            {
+                                _pDB->changeUserOPAtDatabase(tmp_channame, tmp_targetnick, false);
+                            }
                         }
                     }
                     else
                     {
-                        msg = COL + Server::Host + SPACE + ERR_UNKNOWNMODE + SPACE + user->getNickname() + SPACE + param_second + ERR_UNKNOWNMODE_MSG + ENDL;
+                        msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + usernick + \
+                                SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
                         send(_FD, msg.c_str(), msg.size(), 0);
-                        return ;                         
+                        return;
+                    }                        
+                }
+                else if (param_second[1] == 'l')
+                {
+                    if (channel->getChannelMode().bL == 1)
+                    {
+                        channel->setBL(0);
+                        channel->setUserLimit(-1);
                     }
                 }
-                else if (param_second[0] == '+')
+                else
                 {
-                    if (param_second[1] == 'i')
+                    msg = COL + Server::Host + SPACE + ERR_UNKNOWNMODE + SPACE + usernick + SPACE + param_second + ERR_UNKNOWNMODE_MSG + ENDL;
+                    send(_FD, msg.c_str(), msg.size(), 0);
+                    return ;                         
+                }
+            }
+            else if (param_second[0] == '+')
+            {
+                if (param_second[1] == 'i')
+                {
+                    if (channel->getChannelMode().bI == 0)
+                        channel->setBI(1);
+                }
+                else if (param_second[1] == 't')
+                {
+                    if (channel->getChannelMode().bT == 0)
+                        channel->setBT(1); 
+                }
+                else if (param_second[1] == 'k')
+                {
+                    if (CMD.parameters.size() == 3)
                     {
-                        if (channel->getChannelMode().bI == 0)
-                            channel->setBI(1);
+                        channel->setBK(1);                        
+                        channel->setChannelKey(CMD.parameters[2]);
                     }
-                    else if (param_second[1] == 't')
+                    else
                     {
-                        if (channel->getChannelMode().bT == 0)
-                            channel->setBT(1); 
+                        msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
+                        send(_FD, msg.c_str(), msg.size(), 0);     
+                        return ;                           
                     }
-                    else if (param_second[1] == 'k')
+                }
+                else if (param_second[1] == 'o')
+                {
+                    if (CMD.parameters.size() == 3)
                     {
-                        if (CMD.parameters.size() == 3)
+                        User* target = _pDB->searchUser(CMD.parameters[2]);
+                        if (target == NULL)
                         {
-                            channel->setBK(1);                        
-                            channel->setChannelKey(CMD.parameters[2]);
-                        }
-                        else
-                        {
-                            msg = COL + Server::Host + SPACE + ERR_NEEDMOREPARAMS + SPACE + CMD.command + ERR_NEEDMOREPARAMS_MSG + ENDL;
-                            send(_FD, msg.c_str(), msg.size(), 0);     
-                            return ;                           
-                        }
-                    }
-                    else if (param_second[1] == 'o')
-                    {
-                        if (CMD.parameters.size() == 3)
-                        {
-                            User* target = _pDB->searchUser(CMD.parameters[2]);
-                            if (target == NULL)
-                            {
-                                msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + usernick + SPACE + target->getNickname() + ERR_NOSUCHNICK_MSG + ENDL;
-                                send(_FD, msg.c_str(), msg.size(), 0);
-                                return;
-                            }
-                            else 
-                            {
-                                string  tmp_channame = channel->getName();
-                                string  tmp_targetnick = target->getNickname();
-                                int     tmp_auth = _pDB->isUserAtChannel(tmp_channame, tmp_targetnick);
-                                if (tmp_auth == 0) // 채널에 없을때
-                                {
-                                    msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + tmp_targetnick + SPACE + HASH + tmp_channame + ERR_NOTONCHANNEL_MSG + ENDL;
-                                    send(_FD, msg.c_str(), msg.size(), 0); 
-                                    return ;
-                                }
-                                else if (tmp_auth == 1)
-                                {
-                                    _pDB->changeUserOPAtDatabase(tmp_channame, tmp_targetnick, true);
-                                }
-                                else if (tmp_auth == 2)
-                                {
-                                    return ;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + user->getNickname() + \
-                                    SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
+                            msg = COL + Server::Host + SPACE + ERR_NOSUCHNICK + SPACE + usernick + SPACE + target->getNickname() + ERR_NOSUCHNICK_MSG + ENDL;
                             send(_FD, msg.c_str(), msg.size(), 0);
                             return;
-                        }  
-                    }
-                    else if (param_second[1] == 'l')
-                    {
-                        if (CMD.parameters.size() == 3)
-                        {
-                            channel->setBL(1);
-                            stringstream ss(CMD.parameters[2]);
-                            int num;
-                            ss >> num;
-                            if (!ss.fail()) // 테스트 해봤는데 변환 불가능한 문자열은 0으로 됨
-                                channel->setUserLimit(num); // atoi, 음수도 그대로 들어가짐(상용기준)
-                            else
-                                channel->setUserLimit(0);                                
                         }
-                        else
+                        else 
                         {
-                            msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + user->getNickname() + \
-                                    SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
-                            send(_FD, msg.c_str(), msg.size(), 0);
-                            return ;                             
+                            string  tmp_channame = channel->getName();
+                            string  tmp_targetnick = target->getNickname();
+                            int     tmp_auth = _pDB->isUserAtChannel(tmp_channame, tmp_targetnick);
+                            if (tmp_auth == 0) // 채널에 없을때
+                            {
+                                msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + tmp_targetnick + SPACE + HASH + tmp_channame + ERR_NOTONCHANNEL_MSG + ENDL;
+                                send(_FD, msg.c_str(), msg.size(), 0); 
+                                return ;
+                            }
+                            else if (tmp_auth == 1)
+                            {
+                                _pDB->changeUserOPAtDatabase(tmp_channame, tmp_targetnick, true);
+                            }
+                            else if (tmp_auth == 2)
+                                return ;
                         }
                     }
                     else
                     {
-                        msg = COL + Server::Host + SPACE + ERR_UNKNOWNMODE + SPACE + user->getNickname() + SPACE + param_second + ERR_UNKNOWNMODE_MSG + ENDL;
-                        send(_FD, msg.c_str(), msg.size(), 0);     
-                        return ;                   
+                        msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + usernick + \
+                                SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
+                        send(_FD, msg.c_str(), msg.size(), 0);
+                        return;
+                    }  
+                }
+                else if (param_second[1] == 'l')
+                {
+                    if (CMD.parameters.size() == 3)
+                    {
+                        channel->setBL(1);
+                        stringstream ss(CMD.parameters[2]);
+                        int num;
+                        ss >> num;
+                        if (!ss.fail()) // 테스트 해봤는데 변환 불가능한 문자열은 0으로 됨
+                            channel->setUserLimit(num); // atoi, 음수도 그대로 들어가짐(상용기준)
+                        else
+                            channel->setUserLimit(0);                                
+                    }
+                    else
+                    {
+                        msg = COL + Server::Host + SPACE + ERR_INVALIDMODEPARAM + SPACE + usernick + \
+                                SPACE + channel->getName() + SPACE + param_second[1] + ERR_INVALIDMODEPARAM_MSG + ENDL;
+                        send(_FD, msg.c_str(), msg.size(), 0);
+                        return ;                             
                     }
                 }
-                msg = COL + usernick + EXCL +  user->getRealname() + SPACE + CMD.command + SPACE + HASH + param_first + \
-                        SPACE + param_second + SPACE + COL;
-                if (CMD.parameters.size() == 3)
-                    msg.append(CMD.parameters[2]);
-                msg.append(ENDL);
-                std::vector<int>fds = _pDB->getFdsAtChannel(param_first);
-                for (size_t i = 0; i < fds.size(); ++i) // announce to all
-                    send(fds[i], msg.c_str(), msg.size(), 0);              
+                else
+                {
+                    msg = COL + Server::Host + SPACE + ERR_UNKNOWNMODE + SPACE + usernick + SPACE + param_second + ERR_UNKNOWNMODE_MSG + ENDL;
+                    send(_FD, msg.c_str(), msg.size(), 0);     
+                    return ;                   
+                }
             }
-            else
-            {
-                msg = COL + Server::Host + SPACE + ERR_UNKNOWNMODE + SPACE + user->getNickname() + SPACE + param_second + ERR_UNKNOWNMODE_MSG + ENDL;
-                send(_FD, msg.c_str(), msg.size(), 0); 
-            }
+            msg = COL + usernick + EXCL +  user->getRealname() + SPACE + CMD.command + SPACE + HASH + param_first + \
+                    SPACE + param_second + SPACE + COL;
+            if (CMD.parameters.size() == 3)
+                msg.append(CMD.parameters[2]);
+            msg.append(ENDL);
+            std::vector<int>fds = _pDB->getFdsAtChannel(param_first);
+            for (size_t i = 0; i < fds.size(); ++i) // announce to all
+                send(fds[i], msg.c_str(), msg.size(), 0);              
+
         }
 
     }

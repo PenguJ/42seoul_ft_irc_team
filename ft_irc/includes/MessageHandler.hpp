@@ -105,6 +105,8 @@ public:
     static const string RPL_MYINFO;
     static const string RPL_MYINFO_MSG;
     static const string RPL_UMODEIS;
+    static const string RPL_CHANNELMODEIS;
+    static const string RPL_CREATIONTIME;
     static const string RPL_NOTOPIC;
     static const string RPL_NOTOPIC_MSG;
     static const string RPL_TOPIC;
