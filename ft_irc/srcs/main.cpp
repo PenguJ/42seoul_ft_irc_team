@@ -6,6 +6,11 @@ string Server::Host = "pythonIRC";
 u_int16_t Server::Port = 0;
 string Server::PortSTR;
 
+void check_leaks()
+{
+    system("leaks ircserv");
+}
+
 static void HandleSIGINT(int)
 {
     Server::bRunning = false;
@@ -68,6 +73,7 @@ static bool isValidPassword(const char* str)
 
 int main(int argc, char* argv[])
 {
+atexit(check_leaks);
 {
     if (argc != 3)
     {

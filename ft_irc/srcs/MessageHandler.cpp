@@ -179,10 +179,12 @@ MessageHandler::MessageHandler(const MessageHandler& rCopy)
     //PUBLIC:
 void MessageHandler::run(string BUFF, vector<pollfd>* pPFDS)
 {
-    cout<<"in MessageHandler::FD["<<_FD<<"]: "<<_BUFF<<endl;
 
     _BUFF += BUFF;
     _pPFDS = pPFDS;
+
+    //TEST_CODE for /r/n(ctrl + v -> ctrl + m -> ctrl + j)
+    cout<<"in MessageHandler::FD["<<_FD<<"]: "<<_BUFF<<endl;
 
     while (_BUFF.size())
     {

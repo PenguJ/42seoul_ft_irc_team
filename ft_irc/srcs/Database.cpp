@@ -488,19 +488,7 @@ void Database::changeUserOPAtDatabase(string chanName, string userNick, bool is_
 
 void Database::createMessageHandler(int FD, string BUFF, Database * const pDB, vector<pollfd>* pPFDS)
 {
-    (void)FD;
-    (void)BUFF;
-    (void)pDB;
-    (void)pPFDS;
-
-
-
-
-
-
-
-
-
+    _MSGs.push_back(new MessageHandler(FD, BUFF, pDB, pPFDS));
 }
 
 
@@ -509,10 +497,7 @@ void Database::createMessageHandler(int FD, string BUFF, Database * const pDB, v
 
 MessageHandler* Database::searchMessageHandler(int FD)
 {
-    (void)FD;
-
-
-    return (NULL);
+    return (_MSGs[FD]);
 }
 
 //****************************************************************************/
