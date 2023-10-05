@@ -176,6 +176,25 @@ std::cout<<"INTO POOL LOOP"<<std::endl;
 // cout<<"for loop(servSock: "<<_servSock<<")"<<endl;
             if (NO_EVENT)
             {
+                if (iter->revents != 0)
+                {
+                    if (_pDB->searchUser(iter->fd) == NULL)
+                    {
+                        cout<<"[-] fd: "<<iter->fd<<": disconnected!(Serv)"<<endl;
+                        _pDB->destroyMessageHandler(iter->fd);
+                        close(iter->fd);
+                        _PFDS.erase(iter);
+                    }
+                    else
+                    {
+                        cout<<"[-] fd: "<<iter->fd<<": disconnected!(Serv)"<<endl;
+                        _pDB->clearUserAtDatabase(iter->fd);
+                        _PFDS.erase(iter);
+                    }
+
+                    goto ESCAPE_EVENT_SEARCHING_LOOP;
+                }
+                
 std::cout<<"HELLO1"<<std::endl;
 // cout<<"NO_EVENT   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<endl;
                 continue ;
@@ -213,13 +232,6 @@ std::cout<<"HELLO3"<<std::endl;
                 /* if exist ErrCode about bad condition of server, then send */
                     goto ESCAPE_EVENT_SEARCHING_LOOP;
                 case 0:
-
-
-
-
-
-
-
                     cout<<"[-] fd: "<<iter->fd<<": disconnected!(Serv)"<<endl;
                     _pDB->clearUserAtDatabase(iter->fd);
                     _PFDS.erase(iter);

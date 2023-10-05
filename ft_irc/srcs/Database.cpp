@@ -95,6 +95,13 @@ Database::Database(const Database& rCopy)
     //PUBLIC:
 void Database::clearDatabase()
 {
+    for (size_t i = 0; i < _MSGs.size(); ++i)
+    {
+        if (searchUser(i) == NULL)
+        {
+            destroyMessageHandler(i);
+        }
+    }
     for (size_t i = 0; i < _users.size(); ++i)
     {
         delete _MSGs[_users[i]->first];
@@ -119,10 +126,6 @@ void Database::clearDatabase()
         _channelUserTable[i]->_bOP = false;
         delete _channelUserTable[i];
     }
-    destroyMessageHandler(0);
-    destroyMessageHandler(1);
-    destroyMessageHandler(2);
-    destroyMessageHandler(3);
 }
 
 
