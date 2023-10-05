@@ -5,6 +5,7 @@
 
 
 # include <iostream>
+# include <vector>
 
 using namespace std;
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
