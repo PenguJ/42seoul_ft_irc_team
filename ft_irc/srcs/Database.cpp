@@ -97,6 +97,8 @@ void Database::clearDatabase()
 {
     for (size_t i = 0; i < _users.size(); ++i)
     {
+        delete _MSGs[_users[i]->first];
+        _MSGs[_users[i]->first] = NULL;
         close(_users[i]->first);
         _users[i]->first = -1;
         delete _users[i]->second;
@@ -117,6 +119,10 @@ void Database::clearDatabase()
         _channelUserTable[i]->_bOP = false;
         delete _channelUserTable[i];
     }
+    destroyMessageHandler(0);
+    destroyMessageHandler(1);
+    destroyMessageHandler(2);
+    destroyMessageHandler(3);
 }
 
 
@@ -482,13 +488,25 @@ void Database::changeUserOPAtDatabase(string chanName, string userNick, bool is_
     return ;
 }
 
+void Database::destroyMessageHandler(int FD)
+{
+    delete _MSGs[FD];
+    _MSGs[FD] = NULL;
+}
 
 
 
 
 void Database::createMessageHandler(int FD, string BUFF, Database * const pDB, vector<pollfd>* pPFDS)
 {
-    _MSGs.push_back(new MessageHandler(FD, BUFF, pDB, pPFDS));
+    if (_MSGs.size() <= static_cast<size_t>(FD))
+    {
+        _MSGs.push_back(new MessageHandler(FD, BUFF, pDB, pPFDS));
+    }
+    else
+    {
+        _MSGs[FD] = new MessageHandler(FD, BUFF, pDB, pPFDS);
+    }
 }
 
 

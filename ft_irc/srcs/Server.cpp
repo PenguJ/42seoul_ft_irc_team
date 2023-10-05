@@ -176,11 +176,13 @@ std::cout<<"INTO POOL LOOP"<<std::endl;
 // cout<<"for loop(servSock: "<<_servSock<<")"<<endl;
             if (NO_EVENT)
             {
+std::cout<<"HELLO1"<<std::endl;
 // cout<<"NO_EVENT   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<endl;
                 continue ;
             }
             else if (SERV_POLLIN)
             {
+std::cout<<"HELLO2"<<std::endl;
 // cout<<"event SERV_POLLIN   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<endl;
                 SOCKADDR_IN ADDR;
                 socklen_t AddrLEN = sizeof(ADDR);
@@ -198,6 +200,7 @@ std::cout<<"INTO POOL LOOP"<<std::endl;
             }
             else if (CLNT_POLLIN)
             {
+std::cout<<"HELLO3"<<std::endl;
 // cout<<"event CLNT_POLLIN   "<<iter->fd<<"  ev: "<<iter->events<<"  re: "<<iter->revents<<endl;
                 char cBUFF[MAX_MSG_LEN] = {0, };
                 string BUFF;
@@ -210,6 +213,13 @@ std::cout<<"INTO POOL LOOP"<<std::endl;
                 /* if exist ErrCode about bad condition of server, then send */
                     goto ESCAPE_EVENT_SEARCHING_LOOP;
                 case 0:
+
+
+
+
+
+
+
                     cout<<"[-] fd: "<<iter->fd<<": disconnected!(Serv)"<<endl;
                     _pDB->clearUserAtDatabase(iter->fd);
                     _PFDS.erase(iter);

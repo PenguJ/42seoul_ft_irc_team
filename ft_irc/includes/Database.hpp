@@ -93,6 +93,7 @@ public:
                                 Database * const pDB, \
                                 vector<pollfd>* pPFDS);
     MessageHandler* searchMessageHandler(int FD);
+    void destroyMessageHandler(int FD);
 
 //TESTCODE
 void printAllChannalPair();

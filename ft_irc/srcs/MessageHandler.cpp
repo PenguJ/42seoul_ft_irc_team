@@ -230,12 +230,12 @@ void MessageHandler::run(string BUFF, vector<pollfd>* pPFDS)
         TMP.erase(TMP.begin());
         command.parameters = TMP;
 {//TEST CODE
-    // cout<<"[prefix]: "<<command.prefix<<endl;
+    cout<<"[prefix]: "<<command.prefix<<endl;
     cout<<"[command]: "<<command.command<<endl;
-    // cout<<"[params]"<<endl;
-    // for (size_t i = 0; i < command.parameters.size(); ++i)
-    //     cout<<"    ("<<i<<"): "<<command.parameters[i]<<endl;
-    // cout<<"[suffix]: "<<command.suffix<<endl<<endl;
+    cout<<"[params]"<<endl;
+    for (size_t i = 0; i < command.parameters.size(); ++i)
+        cout<<"    ("<<i<<"): "<<command.parameters[i]<<endl;
+    cout<<"[suffix]: "<<command.suffix<<endl<<endl;
 }
     User *user = _pDB->searchUser(_FD); // 유저가 존재하는지, 유저 정보변경등에 사용
 
