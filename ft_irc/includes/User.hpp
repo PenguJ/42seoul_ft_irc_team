@@ -18,23 +18,12 @@ using namespace std;
 // is do inherit? (NO): is abstracted? (NO): is interface? (NO)
 // is be inherited? (NO)
 
-typedef struct UserMode
-{
-    bool    bI; // marks a users as invisible
-    bool    bS; // marks a user for receipt of server notices
-    bool    bW; // user receives wallops
-    bool    bO; /* operator flag
-                If a user attempts to make themselves an operator using the "+o" flag, the attempt should be ignored.  There is no restriction, however, on anyone `deopping' themselves (using "-o") */
-}   s_UserMode;
-
 class User
 {
 public:
     //Constructor overload & OCCF
-    User(int FD, string realname, string nickname, string username, \
-        string host, \
-        bool bI, bool bS, bool bW, bool bO, \
-        bool bAUTH, bool bPWD);
+    User(int FD, string realname, string nickname, \
+         string username, string host, bool bAUTH);
     ~User();
     //Exception
     //Operator overload
@@ -49,12 +38,9 @@ public:
     void setUsername(string& username);
     const string getHost() const;
     void setHost(string& host);
-    s_UserMode getUserMode() const;
-    void setUserMode(s_UserMode& mode);
     bool getBoolAuthority() const;
     void setBoolAuthority(bool& bAUTH);
-    bool getBoolPassword() const;
-    void setBoolPassword(bool& bPWD);
+
     //Behavior
 
 private:
@@ -73,9 +59,7 @@ private:
     string      _nickname;
     string      _username;
     string      _host;
-    s_UserMode  _mode;
     bool        _bAUTH;
-    bool        _bPWD;
 };
 
 //GLOBAL FUNCTION for class User{}

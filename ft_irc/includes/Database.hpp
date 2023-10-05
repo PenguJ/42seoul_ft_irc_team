@@ -2,12 +2,17 @@
 #ifndef DATABASE_HPP
 # define DATABASE_HPP
 
+class MessageHandler;
+
+# include <sys/poll.h>
 
 # include <unistd.h>
 # include <iostream>
 # include <vector>
+
 # include "Channel.hpp"
 # include "User.hpp"
+# include "MessageHandler.hpp"
 
 using namespace std;
 
@@ -61,12 +66,7 @@ public:
                             string nickname, \
                             string username, \
                             string host, \
-                            bool bI, \
-                            bool bS, \
-                            bool bW, \
-                            bool bO, \
-                            bool bAUTH, \
-                            bool bPWD); // when user accepted at server, but not a channel
+                            bool bAUTH); // when user accepted at server, but not a channel
     void clearUserAtDatabase(int FD); // when user quit at server
     void createChannelAtDatabase(User* pMaker, \
                                     string name, \
@@ -87,6 +87,13 @@ public:
     //BY geonlee
     vector<int> getFdsAtChannel(string chanName);
 
+    //BY jeojeon
+    void createMessageHandler(int FD, \
+                                string BUFF, \
+                                Database * const pDB, \
+                                vector<pollfd>* pPFDS);
+    MessageHandler* searchMessageHandler(int FD);
+
 //TESTCODE
 void printAllChannalPair();
 void printAllUserPair();
@@ -104,9 +111,10 @@ private:
     //Behavior
 
 private:
-    UserPairVector      _users;
-    ChannelPairVector   _channels;
-    ChannelUserTable    _channelUserTable;
+    UserPairVector          _users;
+    ChannelPairVector       _channels;
+    ChannelUserTable        _channelUserTable;
+    vector<MessageHandler*> _MSGs;
 };
 
 //GLOBAL FUNCTION for class Database{}

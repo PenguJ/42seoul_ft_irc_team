@@ -21,6 +21,7 @@ Database::Database()
     _users.reserve(FIRST_CAPACITY);
     _users.reserve(FIRST_CAPACITY);
     _channelUserTable.reserve(FIRST_CAPACITY);
+    _MSGs.reserve(FIRST_CAPACITY);
 }
 
 Database::~Database()
@@ -127,17 +128,12 @@ void Database::addUserAtPairVec(int FD,
                                 string nickname, \
                                 string username, \
                                 string host, \
-                                bool bI, \
-                                bool bS, \
-                                bool bW, \
-                                bool bO, \
-                                bool bAUTH, \
-                                bool bPWD)
+                                bool bAUTH)
 {
     UserPair* tmp = new UserPair;
 
     tmp->first = FD;
-    tmp->second = new User(FD, realname, nickname, username, host, bI, bS, bW, bO, bAUTH, bPWD);
+    tmp->second = new User(FD, realname, nickname, username, host, bAUTH);
 
     _users.push_back(tmp);
 }
@@ -216,6 +212,10 @@ void Database::clearUserAtDatabase(int FD)
             ++iter;
         }
     }
+}
+{ // delete User`s MessageHandler
+    delete _MSGs[FD];
+    _MSGs[FD] = NULL;
 }
 }
 
@@ -480,6 +480,39 @@ void Database::changeUserOPAtDatabase(string chanName, string userNick, bool is_
         }
     }
     return ;
+}
+
+
+
+
+
+void Database::createMessageHandler(int FD, string BUFF, Database * const pDB, vector<pollfd>* pPFDS)
+{
+    (void)FD;
+    (void)BUFF;
+    (void)pDB;
+    (void)pPFDS;
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+MessageHandler* Database::searchMessageHandler(int FD)
+{
+    (void)FD;
+
+
+    return (NULL);
 }
 
 //****************************************************************************/

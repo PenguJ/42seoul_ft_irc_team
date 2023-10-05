@@ -21,7 +21,6 @@ Server::Server()
     const u_int8_t FIRST_SERVER_CAPACITY= 255;
 
     _PFDS.reserve(FIRST_SERVER_CAPACITY);
-    // _MSGs.reserve(FIRST_SERVER_CAPACITY);
 }
 
 Server::~Server()
@@ -137,10 +136,10 @@ void Server::execute()
 }
 {
     _pDB = new Database;
-    // _MSGs.push_back(NULL); 
-    // _MSGs.push_back(NULL); 
-    // _MSGs.push_back(NULL); 
-    // _MSGs.push_back(NULL); 
+    _pDB->createMessageHandler(0, "", _pDB, &_PFDS);
+    _pDB->createMessageHandler(1, "", _pDB, &_PFDS);
+    _pDB->createMessageHandler(2, "", _pDB, &_PFDS);
+    _pDB->createMessageHandler(3, "", _pDB, &_PFDS);
 }
 {	// Run IRC-server Process
     while (Server::bRunning)
@@ -192,9 +191,8 @@ std::cout<<"INTO POOL LOOP"<<std::endl;
                 pollfd clnt = {clntFD, POLLIN, 0};
 
                 _PFDS.push_back(clnt);
-                
-                // MessageHandler* msg = new MessageHandler(clntFD, );
-                // _MSGs.push_back(msg);
+
+                _pDB->createMessageHandler(clntFD, "", _pDB, &_PFDS);
                 
                 goto ESCAPE_EVENT_SEARCHING_LOOP;
             }
@@ -223,9 +221,7 @@ exit(1);
                 default:
                     BUFF = cBUFF;
 
-                    MessageHandler msgHandler(iter->fd, BUFF, _pDB, &_PFDS);
-
-                    msgHandler.run();
+                    _pDB->searchMessageHandler(iter->fd)->run(BUFF, &_PFDS);
 
                     goto ESCAPE_EVENT_SEARCHING_LOOP;
                 }

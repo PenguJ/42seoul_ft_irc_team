@@ -4,6 +4,8 @@
 
 using namespace std;
 
+class Database;
+
 # include <iostream>
 # include <vector>
 
@@ -11,6 +13,7 @@ using namespace std;
 # include "../includes/Database.hpp"
 # include "../includes/Server.hpp"
 # include "../includes/User.hpp"
+
 
 //STANDARD: 어떤 상수가 constexpr의 특징을 가지고 있고, 다른 클래스에서 그 값이 사용되는 경우에만
 //				멤버변수를 public으로 선언할 수 있다.
@@ -26,10 +29,10 @@ using namespace std;
 
 typedef struct Command
 {
-    string                 prefix;
-    string                 command;
-    vector<string>    parameters;
-    string                 suffix;
+    string                  prefix;
+    string                  command;
+    vector<string>          parameters;
+    string                  suffix;
 }   s_Command;
 
 class MessageHandler
@@ -42,7 +45,7 @@ public:
     //Operator overload
     //Getter & Setter
     //Behavior
-    void run();
+    void run(string BUFF, vector<pollfd>* pPFDS);
 
 private:
     //Constructor overload & OCCF
@@ -76,10 +79,10 @@ private:
     void KILL(s_Command CMD, User *user);
 
 private:
-    const int           _FD;
-    string              _BUFF;
-    Database * const    _pDB;
-    vector<pollfd>*     _pPFDS;
+    const int               _FD;
+    string                  _BUFF;
+    Database * const        _pDB;
+    vector<pollfd>*         _pPFDS;
 
 public:
 // SPECIAL CHAR
@@ -90,15 +93,25 @@ public:
     static const string HASH;
     static const string EXCL;
     static const string AT;
+    static const string FORBIDDEN_TO_NICK;
 
 // RPL 
     static const string RPL_WELCOME;
+    static const string RPL_WELCOME_MSG;
     static const string RPL_YOURHOST;
+    static const string RPL_YOURHOST_MSG;
+    static const string RPL_CREATED;
+    static const string RPL_CREATED_MSG;
+    static const string RPL_MYINFO;
+    static const string RPL_MYINFO_MSG;
     static const string RPL_UMODEIS;
     static const string RPL_NOTOPIC;
+    static const string RPL_NOTOPIC_MSG;
     static const string RPL_TOPIC;
-    static const string RPL_CREATED;
-    static const string RPL_MYINFO;
+    static const string RPL_INVITING;
+    static const string RPL_NAMREPLY;
+    static const string RPL_ENDOFNAMES;
+    static const string RPL_ENDOFNAMES_MSG;
 
 // ERR
     static const string ERR_UNKNOWNERROR;
@@ -110,16 +123,16 @@ public:
     static const string ERR_CANNOTSENDTOCHAN;
     static const string ERR_CANNOTSENDTOCHAN_MSG;
     static const string ERR_TOOMANYCHANNELS;
+    static const string ERR_TOOMANYTARGETS;
+    static const string ERR_TOOMANYTARGETS_MSG;
     static const string ERR_NOORIGIN;
     static const string ERR_NOORIGIN_MSG;
     static const string ERR_NORECIPIENT;
     static const string ERR_NORECIPIENT_MSG;
     static const string ERR_NOTEXTTOSEND;
     static const string ERR_NOTEXTTOSEND_MSG;
-
     static const string ERR_UNKNOWNCOMMAND;
     static const string ERR_UNKNOWNCOMMAND_MSG;
-
     static const string ERR_NONICKNAMEGIVEN;
     static const string ERR_NONICKNAMEGIVEN_MSG;
     static const string ERR_ERRONEUSNICKNAME;
@@ -128,13 +141,12 @@ public:
     static const string ERR_NICKNAMEINUSE_MSG;
     static const string ERR_UNAVAILRESOURCE;
     static const string ERR_UNAVAILRESOURCE_MSG;
-
     static const string ERR_USERNOTINCHANNEL;
     static const string ERR_USERNOTINCHANNEL_MSG;
     static const string ERR_NOTONCHANNEL;
     static const string ERR_NOTONCHANNEL_MSG;
     static const string ERR_USERONCHANNEL;
-
+    static const string ERR_USERONCHANNEL_MSG;
     static const string ERR_NOTREGISTERED;
     static const string ERR_NOTREGISTERED_MSG;
     static const string ERR_NEEDMOREPARAMS;
@@ -143,33 +155,21 @@ public:
     static const string ERR_ALREADYREGISTERED_MSG;
     static const string ERR_PASSWDMISMATCH;
     static const string ERR_PASSWDMISMATCH_MSG;
-
     static const string ERR_CHANNELISFULL;
     static const string ERR_CHANNELISFULL_MSG;
+    static const string ERR_UNKNOWNMODE;
+    static const string ERR_UNKNOWNMODE_MSG;
     static const string ERR_INVITEONLYCHAN;
     static const string ERR_INVITEONLYCHAN_MSG;
     static const string ERR_BADCHANNELKEY;
     static const string ERR_BADCHANNELKEY_MSG;
-    static const string ERR_ERRONEUSCHANNELNAME;
-    static const string ERR_ERRONEUSCHANNELNAME_MSG;
     static const string ERR_CHANOPRIVSNEEDED;
     static const string ERR_CHANOPRIVSNEEDED_MSG;
-
-//BY jeojeon
-    static const string ERR_TOOMANYTARGETS;
-    static const string ERR_TOOMANYTARGETS_MSG;
-    static const string FORBIDDEN_TO_NICK;
-
-// BY geonlee
-    static const string RPL_INVITING;
-    static const string RPL_NAMREPLY;
-    static const string RPL_ENDOFNAMES;
-    static const string RPL_ENDOFNAMES_MSG;
-    static const string ERR_UNKNOWNMODE;
-    static const string ERR_UNKNOWNMODE_MSG;
-    static const string ERR_USERONCHANNEL_MSG;
+    static const string ERR_ERRONEUSCHANNELNAME;
+    static const string ERR_ERRONEUSCHANNELNAME_MSG;
     static const string ERR_INVALIDMODEPARAM;
     static const string ERR_INVALIDMODEPARAM_MSG;
+
 };
 
 //GLOBAL FUNCTION for class MessageHandler{}

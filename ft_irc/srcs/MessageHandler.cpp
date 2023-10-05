@@ -1,6 +1,7 @@
 #include <sstream>
 #include "../includes/MessageHandler.hpp"
 
+// SPECIAL CHAR
 const string MessageHandler::ENDL = "\r\n";
 const string MessageHandler::COL = ":";
 const string MessageHandler::SPACE = " ";
@@ -8,17 +9,28 @@ const string MessageHandler::AST = "*";
 const string MessageHandler::HASH = "#";
 const string MessageHandler::EXCL = "!";
 const string MessageHandler::AT = "@";
+const string MessageHandler::FORBIDDEN_TO_NICK = " !\"#$%&'()*+,-./:;<=>?@[\\]^`{|}~";
+
+// RPL
 const string MessageHandler::RPL_WELCOME = "001";
+const string MessageHandler::RPL_WELCOME_MSG = " :Welcome to ft_irc! ";
 const string MessageHandler::RPL_YOURHOST = "002";
+const string MessageHandler::RPL_YOURHOST_MSG = " :Your host is pythonIRC, running version 0.0.1";
 const string MessageHandler::RPL_CREATED = "003";
+const string MessageHandler::RPL_CREATED_MSG = " :This server was created 2023/09";
 const string MessageHandler::RPL_MYINFO = "004";
+const string MessageHandler::RPL_MYINFO_MSG = "0.0.1 i iklot :klo";
 const string MessageHandler::RPL_UMODEIS = "221";
 const string MessageHandler::RPL_NOTOPIC = "331";
+const string MessageHandler::RPL_NOTOPIC_MSG = " :No topic is set";
 const string MessageHandler::RPL_TOPIC = "332";
+const string MessageHandler::RPL_INVITING = "341";
 const string MessageHandler::RPL_NAMREPLY = "353";
 const string MessageHandler::RPL_ENDOFNAMES = "366";
 const string MessageHandler::RPL_ENDOFNAMES_MSG = " :End of /NAMES list";
 
+
+// ERR
 const string MessageHandler::ERR_UNKNOWNERROR = "400";
 const string MessageHandler::ERR_NOSUCHNICK = "401";
 const string MessageHandler::ERR_NOSUCHNICK_MSG = " :No such nick/channel";
@@ -28,16 +40,16 @@ const string MessageHandler::ERR_NOSUCHCHANNEL_MSG = " :No such channel";
 const string MessageHandler::ERR_CANNOTSENDTOCHAN = "404";
 const string MessageHandler::ERR_CANNOTSENDTOCHAN_MSG = " :Cannot send to channel";
 const string MessageHandler::ERR_TOOMANYCHANNELS = "405";
+const string MessageHandler::ERR_TOOMANYTARGETS = "407";
+const string MessageHandler::ERR_TOOMANYTARGETS_MSG = " :Duplicate recipients. No message delivered";
 const string MessageHandler::ERR_NOORIGIN = "409";
 const string MessageHandler::ERR_NOORIGIN_MSG = " :No origin specified";
 const string MessageHandler::ERR_NORECIPIENT = "411";
 const string MessageHandler::ERR_NORECIPIENT_MSG = " :No recipient given";
 const string MessageHandler::ERR_NOTEXTTOSEND = "412";
 const string MessageHandler::ERR_NOTEXTTOSEND_MSG = " :No text to send";
-
 const string MessageHandler::ERR_UNKNOWNCOMMAND = "421";
 const string MessageHandler::ERR_UNKNOWNCOMMAND_MSG = " :Unknown command";
-
 const string MessageHandler::ERR_NONICKNAMEGIVEN = "431";
 const string MessageHandler::ERR_NONICKNAMEGIVEN_MSG = " :No nickname given";
 const string MessageHandler::ERR_ERRONEUSNICKNAME = "432";
@@ -46,12 +58,12 @@ const string MessageHandler::ERR_NICKNAMEINUSE = "433";
 const string MessageHandler::ERR_NICKNAMEINUSE_MSG = " :Nickname is already in use";
 const string MessageHandler::ERR_UNAVAILRESOURCE = "437";
 const string MessageHandler::ERR_UNAVAILRESOURCE_MSG = " :Channel is temporarily unavailable";
-
 const string MessageHandler::ERR_USERNOTINCHANNEL = "441";
 const string MessageHandler::ERR_USERNOTINCHANNEL_MSG = " :They aren't on that channel";
 const string MessageHandler::ERR_NOTONCHANNEL = "442";
 const string MessageHandler::ERR_NOTONCHANNEL_MSG = " :You're not on that channel";
 const string MessageHandler::ERR_USERONCHANNEL = "443";
+const string MessageHandler::ERR_USERONCHANNEL_MSG = " :is already on channel";
 const string MessageHandler::ERR_NOTREGISTERED = "451";
 const string MessageHandler::ERR_NOTREGISTERED_MSG = " :You have not registered";
 const string MessageHandler::ERR_NEEDMOREPARAMS = "461";
@@ -60,9 +72,10 @@ const string MessageHandler::ERR_ALREADYREGISTERED = "462";
 const string MessageHandler::ERR_ALREADYREGISTERED_MSG = " :You may not reregister";
 const string MessageHandler::ERR_PASSWDMISMATCH = "464";
 const string MessageHandler::ERR_PASSWDMISMATCH_MSG = " :Password incorrect";
-
 const string MessageHandler::ERR_CHANNELISFULL = "471";
 const string MessageHandler::ERR_CHANNELISFULL_MSG = " :Cannot join channel (+l)";
+const string MessageHandler::ERR_UNKNOWNMODE = "472";
+const string MessageHandler::ERR_UNKNOWNMODE_MSG = " : is unknown mode char to me";
 const string MessageHandler::ERR_INVITEONLYCHAN = "473";
 const string MessageHandler::ERR_INVITEONLYCHAN_MSG = " :Cannot join channel (+i)";
 const string MessageHandler::ERR_BADCHANNELKEY = "475";
@@ -71,17 +84,6 @@ const string MessageHandler::ERR_ERRONEUSCHANNELNAME = "479";
 const string MessageHandler::ERR_ERRONEUSCHANNELNAME_MSG = " :Channel name contains illegal characters";
 const string MessageHandler::ERR_CHANOPRIVSNEEDED = "482";
 const string MessageHandler::ERR_CHANOPRIVSNEEDED_MSG = " :You're not channel operator";
-
-//BY jeojeon
-const string MessageHandler::ERR_TOOMANYTARGETS = "407";
-const string MessageHandler::ERR_TOOMANYTARGETS_MSG = " :Duplicate recipients. No message delivered";
-const string MessageHandler::FORBIDDEN_TO_NICK = " !\"#$%&'()*+,-./:;<=>?@[\\]^`{|}~";
-
-//BY geonlee
-const string MessageHandler::RPL_INVITING = "341";
-const string MessageHandler::ERR_UNKNOWNMODE = "472";
-const string MessageHandler::ERR_UNKNOWNMODE_MSG = " : is unknown mode char to me";
-const string MessageHandler::ERR_USERONCHANNEL_MSG = " :is already on channel";
 const string MessageHandler::ERR_INVALIDMODEPARAM = "696";
 const string MessageHandler::ERR_INVALIDMODEPARAM_MSG = " :You must specify a parameter for the limit mode.";
 
@@ -175,9 +177,12 @@ MessageHandler::MessageHandler(const MessageHandler& rCopy)
 //****************************************************************************/
 //Behavior *******************************************************************/
     //PUBLIC:
-void MessageHandler::run()
+void MessageHandler::run(string BUFF, vector<pollfd>* pPFDS)
 {
     cout<<"in MessageHandler::FD["<<_FD<<"]: "<<_BUFF<<endl;
+
+    _BUFF += BUFF;
+    _pPFDS = pPFDS;
 
     while (_BUFF.size())
     {
@@ -326,7 +331,7 @@ void MessageHandler::CAP(s_Command CMD, User *user)
     {
         string tmp = "default";
         // _FD를 제외하고 기본값만을 가진 user를 만든다.
-        _pDB->addUserAtPairVec(_FD,tmp, tmp, tmp, tmp, 0,0,0,0,0,0);
+        _pDB->addUserAtPairVec(_FD,tmp, tmp, tmp, tmp, 0);
     }
 }
 
@@ -442,18 +447,11 @@ void MessageHandler::USER(s_Command CMD, User *user)
             user->setUsername(tmpUsername);
             if (CMD.suffix.length())
                 user->setRealname(CMD.suffix);
-            string welcome = " :Welcome to ft_irc! ";
-            string yourhost = " :Your host is pythonIRC, running version 0.0.1";
-            string created = " :This server was created 2023/09";
-            string modeinfo = "0.0.1 i iklot :klo";
-            msg = COL + Server::Host + SPACE + RPL_WELCOME + SPACE + user->getNickname() + welcome + tmpUsername + ENDL +
-                COL + Server::Host + SPACE + RPL_YOURHOST + SPACE + user->getNickname() + yourhost + ENDL +
-                COL + Server::Host + SPACE + RPL_CREATED + SPACE + user->getNickname() + created + ENDL +
-                COL + Server::Host + SPACE + RPL_MYINFO + SPACE + user->getNickname() + Server::Host + SPACE + modeinfo + ENDL;
+            msg = COL + Server::Host + SPACE + RPL_WELCOME + SPACE + user->getNickname() + RPL_WELCOME_MSG + tmpUsername + ENDL + \
+                  COL + Server::Host + SPACE + RPL_YOURHOST + SPACE + user->getNickname() + RPL_YOURHOST_MSG + ENDL + \
+                  COL + Server::Host + SPACE + RPL_CREATED + SPACE + user->getNickname() + RPL_CREATED_MSG + ENDL + \
+                  COL + Server::Host + SPACE + RPL_MYINFO + SPACE + user->getNickname() + Server::Host + SPACE + RPL_MYINFO_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0); 
-        // :chika.luatic.net 003 a :This server was created 23:02:59 Jun 07 2021
-        // :chika.luatic.net 004 a chika.luatic.net InspIRCd-3 HILRSTWcgikorswxz CFILMNRSTbcefgijklmnoprstvxz :FILbefgjklov
-            // :chika.luatic.net 002 a :Your host is *.Luatic.net, running version InspIRCd-3
         }
     }
 }
@@ -482,7 +480,6 @@ void MessageHandler::PASS(s_Command CMD, User *user)
     else // 비밀번호 맞을떄
     {
         bool auth = 1;
-        cout<< "good" << endl;
         user->setBoolAuthority(auth);
     }
 }
@@ -736,8 +733,6 @@ void MessageHandler::MODE(s_Command CMD, User *user)
             string inv_mode = "+i";
             msg = COL + Server::Host + SPACE + RPL_UMODEIS + SPACE + param_first + SPACE + COL + inv_mode + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);
-            
-            cout << "MODE USER OK " << endl;
         }
     }
     
@@ -1031,7 +1026,6 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                     {
                         SKIP_CHAN_OPT_CHECKING:
 
-                        cout  << "channel : " << _pDB->getUsersAtChannel(channel_name).size()  << "/" << CHANNEL->getChannelMode().userLimit << endl;
                         _pDB->joinChannel(FD, channel_name, false);
                         msg = COL + user_nick + EXCL + user->getRealname() + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL;
                         std::vector<int>fds = _pDB->getFdsAtChannel(channel_name);
@@ -1053,8 +1047,8 @@ void MessageHandler::JOIN(s_Command CMD, User *user)
                             users_msg.append(userlist[i]);
                         }
                         msg = COL + user_nick + EXCL + user->getRealname() + SPACE + CMD.command + SPACE + HASH + channel_name + SPACE + AST + SPACE + COL + user_real + ENDL +\
-                        COL + Server::Host + SPACE + RPL_NAMREPLY + SPACE + user_nick + SPACE + AT + SPACE + HASH + channel_name + SPACE + COL + users_msg + ENDL +\
-                        COL + Server::Host + SPACE + RPL_ENDOFNAMES + SPACE + user_nick + SPACE + HASH + channel_name + RPL_ENDOFNAMES_MSG + ENDL;
+                              COL + Server::Host + SPACE + RPL_NAMREPLY + SPACE + user_nick + SPACE + AT + SPACE + HASH + channel_name + SPACE + COL + users_msg + ENDL +\
+                              COL + Server::Host + SPACE + RPL_ENDOFNAMES + SPACE + user_nick + SPACE + HASH + channel_name + RPL_ENDOFNAMES_MSG + ENDL;
                         send(_FD, msg.c_str(), msg.size(), 0);
                     }
                 }
@@ -1121,8 +1115,7 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
         {
             if (channel->getTopic() == "") // 토픽이 없을경우
             {   
-                std::string RPL_TOPIC_MSG = " :No topic is set";
-                msg = COL + Server::Host + SPACE + RPL_NOTOPIC + SPACE + nickname + SPACE + HASH + channelname + RPL_TOPIC_MSG + ENDL;
+                msg = COL + Server::Host + SPACE + RPL_NOTOPIC + SPACE + nickname + SPACE + HASH + channelname + RPL_NOTOPIC_MSG + ENDL;
                 send(_FD, msg.c_str(), msg.size(), 0);  
             }
             else // 토픽이 있을경우
@@ -1134,7 +1127,6 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
     }
     else if (CMD.parameters.size() == 1 && !(CMD.suffix.empty())) // channel의 topic 변경
     {
-        std::cout << "HERE" << std::endl;
         if (!(channel->getChannelMode().bT) && auth == 1) // 채널 mode +t이면서 권한 없을 시 
         {
             msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED  + SPACE + HASH + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
@@ -1143,7 +1135,6 @@ void MessageHandler::TOPIC(s_Command CMD, User *user)
         else
         {
             channel->setTopic(CMD.suffix);
-            cout << CMD.suffix << "is topic!" << endl;
             vector<string> nicknames = _pDB->getUsersAtChannel(channelname);
             vector<int>fds = _pDB->getFdsAtChannel(channelname);
             for (size_t i = 0; i < nicknames.size(); ++i) // announce to all
@@ -1184,9 +1175,7 @@ void MessageHandler::PING(s_Command CMD, User *user)
     {
         string PONG = "PONG";
         msg = COL + Server::Host + SPACE + PONG + SPACE + Server::Host + SPACE +CMD.parameters[0] + ENDL;
-        send(_FD, msg.c_str(), msg.size(), 0);   
-
-        cout << "PONG SENTED!!" << endl;                   
+        send(_FD, msg.c_str(), msg.size(), 0);                     
     }
 }
 
