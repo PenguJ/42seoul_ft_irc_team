@@ -552,6 +552,10 @@ void MessageHandler::MODE(s_Command CMD, User *user)
             msg = COL + Server::Host + SPACE + ERR_NOTONCHANNEL + SPACE + usernick + SPACE + param_first + ERR_NOTONCHANNEL_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0); 
         }
+        else if (param_second == "b")
+        {
+            return;
+        }
         else if (auth == 1)
         {
             msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + usernick + SPACE + HASH + param_first + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
