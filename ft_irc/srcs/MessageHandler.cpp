@@ -531,7 +531,7 @@ void MessageHandler::MODE(s_Command CMD, User *user)
         }
         else if (auth == 1)
         {
-            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + user->getNickname() + SPACE + HASH + param_first + ERR_CHANOPRIVSNEEDED + ENDL;
+            msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + user->getNickname() + SPACE + HASH + param_first + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
             send(_FD, msg.c_str(), msg.size(), 0);             
         }
         else
