@@ -6,7 +6,7 @@
 /*   By: jeojeon <jeojeon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/07 10:56:03 by jeojeon           #+#    #+#             */
-/*   Updated: 2023/10/07 14:22:02 by jeojeon          ###   ########.fr       */
+/*   Updated: 2023/10/07 15:44:03 by jeojeon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -814,7 +814,7 @@ void MessageHandler::INVITE(s_Command CMD, User *user)
     }
     else if (auth == 1) 
     {
-        msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + nickname + SPACE + channelname + ERR_CHANOPRIVSNEEDED + ENDL;
+        msg = COL + Server::Host + SPACE + ERR_CHANOPRIVSNEEDED + SPACE + nickname + SPACE + channelname + ERR_CHANOPRIVSNEEDED_MSG + ENDL;
         send(_FD, msg.c_str(), msg.size(), 0); 
     }
     else
